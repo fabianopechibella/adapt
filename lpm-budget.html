@@ -120,6 +120,7 @@
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button id="share-button" class="btn btn-secondary">Compartilhar sala</button>
+        <button id="consolidation-button" class="btn btn-secondary">&#128202; Ver Consolidado</button>
         <button id="reset-button" class="btn btn-dark">Reiniciar board</button>
       </div>
     </section>
@@ -234,6 +235,7 @@
       document.getElementById('join-room').value = initial.room;
       document.getElementById('join-button').addEventListener('click', joinRoom);
       document.getElementById('share-button').addEventListener('click', shareLink);
+      document.getElementById('consolidation-button').addEventListener('click', () => { window.open('lpm-consolidation.html', '_blank'); });
       document.getElementById('reset-button').addEventListener('click', resetBoard);
       document.getElementById('budget-input').addEventListener('change', (event) => updateBudget(event.target.value));
       ['available-column', 'funded-column'].forEach(id => {
