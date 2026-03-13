@@ -66,6 +66,16 @@
     .epic-name { color: var(--navy); font-size: 18px; font-weight: 900; margin-top: 8px; }
     .epic-desc { margin-top: 8px; font-size: 14px; color: #64748b; line-height: 1.45; }
     .epic-cost { color: #fff; border-radius: 18px; padding: 10px 12px; font-size: 14px; font-weight: 900; min-width: 90px; text-align: center; }
+    .epic-card.blocked { opacity: 0.5; cursor: not-allowed; }
+    .epic-card.blocked .epic-name { color: #94a3b8; }
+    .block-badge { display: inline-flex; align-items: center; gap: 4px; background: #fef2f2; color: #b91c1c;
+                   border: 1px solid #fecdd3; border-radius: 999px; padding: 3px 10px; font-size: 11px; font-weight: 700; margin-top: 8px; }
+    .constraint-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+                        background: #b91c1c; color: #fff; border-radius: 18px; padding: 14px 22px;
+                        font-size: 14px; font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+                        z-index: 9999; max-width: 480px; text-align: center;
+                        animation: slideUp .2s ease; pointer-events: none; }
+    @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(12px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
     .epic-actions { margin-top: 16px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
     .epic-hint { font-size: 11px; text-transform: uppercase; letter-spacing: .16em; color: #94a3b8; font-weight: 700; }
     .empty-state { display: grid; place-items: center; flex: 1; text-align: center; border: 2px dashed rgba(29,160,169,0.35); background: #F1FBFB; border-radius: 28px; padding: 24px; }
@@ -208,6 +218,56 @@
       updated_at: new Date().toISOString()
     };
 
+    // Business rules: which funded epics block others, and which require another funded epic
+    const CONSTRAINTS = {
+      // if key is funded → values are blocked
+      blocks: { p1: ['p2', 'p3'], p2: ['p1'] },
+      // key can only be funded if value is already funded
+      requires: { p3: 'p2' },
+      // if key is unfunded → cascade-unfund values
+      cascade: { p2: ['p3'] }
+    };
+
+    function getBlockedIds(epics) {
+      const fundedIds = new Set(epics.filter(e => e.status === 'funded').map(e => e.id));
+      const blocked = new Set();
+      for (const [src, targets] of Object.entries(CONSTRAINTS.blocks)) {
+        if (fundedIds.has(src)) targets.forEach(t => blocked.add(t));
+      }
+      return blocked;
+    }
+
+    function constraintViolation(epicId, targetStatus, epics) {
+      if (targetStatus !== 'funded') return null;
+      const fundedIds = new Set(epics.filter(e => e.status === 'funded').map(e => e.id));
+      // Check if blocked by a currently funded epic
+      for (const [src, targets] of Object.entries(CONSTRAINTS.blocks)) {
+        if (fundedIds.has(src) && targets.includes(epicId)) {
+          const blocker = epics.find(e => e.id === src);
+          return `Conflito: "${blocker?.name || src}" já está financiado e bloqueia este épico.`;
+        }
+      }
+      // Check required dependency
+      const req = CONSTRAINTS.requires[epicId];
+      if (req && !fundedIds.has(req)) {
+        const dep = epics.find(e => e.id === req);
+        return `Dependência: financie primeiro "${dep?.name || req}".`;
+      }
+      return null;
+    }
+
+    let _toastTimer = null;
+    function showToast(msg) {
+      const existing = document.querySelector('.constraint-toast');
+      if (existing) existing.remove();
+      if (_toastTimer) clearTimeout(_toastTimer);
+      const toast = document.createElement('div');
+      toast.className = 'constraint-toast';
+      toast.textContent = '⚠ ' + msg;
+      document.body.appendChild(toast);
+      _toastTimer = setTimeout(() => toast.remove(), 3500);
+    }
+
     const state = {
       room: '', name: '', sessionId: uid('user'),
       color: [PALETTE.orange1, PALETTE.orange2, PALETTE.steel, PALETTE.cyan, PALETTE.teal][Math.floor(Math.random() * 5)],
@@ -338,8 +398,17 @@
     async function moveEpic(epicId, targetStatus) {
       const epic = state.board.epics.find(e => e.id === epicId);
       if (!epic || epic.status === targetStatus) return;
+      const violation = constraintViolation(epicId, targetStatus, state.board.epics);
+      if (violation) { showToast(violation); return; }
       const next = deepClone(state.board);
       next.epics = next.epics.map(e => e.id === epicId ? Object.assign({}, e, { status: targetStatus }) : e);
+      // Cascade unfunding: if an epic is removed and others depend on it, remove them too
+      if (targetStatus === 'available') {
+        const cascade = CONSTRAINTS.cascade[epicId] || [];
+        cascade.forEach(depId => {
+          next.epics = next.epics.map(e => e.id === depId ? Object.assign({}, e, { status: 'available' }) : e);
+        });
+      }
       next.activity = [{ id: uid('act'), ts: Date.now(), text: (state.name || 'Participante') + ' ' + (targetStatus === 'funded' ? 'financiou' : 'removeu') + ' "' + epic.name + '".' }].concat(next.activity || []).slice(0, 50);
       try { await saveCurrentBoard(next); } catch (error) { showError('Falha ao atualizar o board: ' + error.message); }
     }
@@ -383,12 +452,19 @@
     function renderEpics(listId, epics, targetStatus, emptyForFunded) {
       const list = document.getElementById(listId); list.innerHTML = '';
       if (!epics.length && emptyForFunded) { const empty = document.createElement('div'); empty.className = 'empty-state'; empty.innerHTML = '<div><div class="empty-title">Arraste os épicos para montar o portfólio financiado</div><div class="empty-text">Objetivo: fechar um conjunto coerente sem exceder o limite.</div></div>'; list.appendChild(empty); return; }
+      const blockedIds = getBlockedIds(state.board.epics);
       epics.forEach(epic => {
-        const theme = themeById(epic.themeId); const card = document.createElement('div'); card.className = 'epic-card'; card.draggable = true;
-        card.addEventListener('dragstart', (event) => { event.dataTransfer.setData('text/plain', epic.id); card.classList.add('dragging'); });
+        const theme = themeById(epic.themeId);
+        const violation = constraintViolation(epic.id, targetStatus, state.board.epics);
+        const isBlocked = !!violation;
+        const card = document.createElement('div');
+        card.className = 'epic-card' + (isBlocked ? ' blocked' : '');
+        card.draggable = !isBlocked;
+        card.addEventListener('dragstart', (event) => { if (isBlocked) { event.preventDefault(); return; } event.dataTransfer.setData('text/plain', epic.id); card.classList.add('dragging'); });
         card.addEventListener('dragend', () => card.classList.remove('dragging'));
-        card.innerHTML = `<div class="epic-top"><div><span class="theme-pill" style="background:${theme ? theme.color : PALETTE.cyan};">${theme ? theme.name : 'Theme'}</span><div class="epic-name">${epic.name}</div><div class="epic-desc">${epic.description}</div></div><div class="epic-cost" style="background:${cardThemeColor(epic)};">${compactMoney(epic.cost)}</div></div><div class="epic-actions"><span class="epic-hint">Arrastar ou usar ação rápida</span></div>`;
-        const button = document.createElement('button'); button.className = 'btn'; button.style.padding = '10px 14px'; button.style.borderRadius = '16px'; button.style.color = '#fff'; button.style.background = epic.status === 'available' ? 'var(--orange1)' : 'var(--blueDeep)'; button.textContent = epic.status === 'available' ? 'Financiar' : 'Remover'; button.addEventListener('click', () => moveEpic(epic.id, targetStatus)); card.querySelector('.epic-actions').appendChild(button); list.appendChild(card);
+        const blockBadge = isBlocked ? `<div class="block-badge">&#128274; ${violation}</div>` : '';
+        card.innerHTML = `<div class="epic-top"><div><span class="theme-pill" style="background:${theme ? theme.color : PALETTE.cyan};">${theme ? theme.name : 'Theme'}</span><div class="epic-name">${epic.name}</div><div class="epic-desc">${epic.description}</div>${blockBadge}</div><div class="epic-cost" style="background:${cardThemeColor(epic)};">${compactMoney(epic.cost)}</div></div><div class="epic-actions"><span class="epic-hint">Arrastar ou usar ação rápida</span></div>`;
+        const button = document.createElement('button'); button.className = 'btn'; button.style.padding = '10px 14px'; button.style.borderRadius = '16px'; button.style.color = '#fff'; button.style.background = epic.status === 'available' ? 'var(--orange1)' : 'var(--blueDeep)'; button.textContent = epic.status === 'available' ? 'Financiar' : 'Remover'; button.disabled = isBlocked; button.style.opacity = isBlocked ? '0.4' : '1'; button.addEventListener('click', () => moveEpic(epic.id, targetStatus)); card.querySelector('.epic-actions').appendChild(button); list.appendChild(card);
       });
     }
 
