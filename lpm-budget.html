@@ -167,12 +167,11 @@
       getDatabase, ref, set, get, onValue, onDisconnect
     } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js'
 
-    if (!validateFirebaseConfig(FIREBASE_CONFIG)) {
-      throw new Error('Preencha corretamente o firebase-config.js com os dados reais do seu projeto Firebase.')
-    }
-
-    const app = initializeApp(FIREBASE_CONFIG)
-    const db = getDatabase(app)
+    let app, db
+    try {
+      app = initializeApp(FIREBASE_CONFIG)
+      db = getDatabase(app)
+    } catch (_) { /* config inválido — boot() vai exibir o erro */ }
 
     const PALETTE = { orange1:'#F78D2A', orange2:'#F7941E', amber:'#FBAE2C', yellow:'#F4D62D', navy:'#003646', blueDeep:'#005265', steel:'#2D789F', cyan:'#1BA2C8', teal:'#1DA0A9', paper:'#F7FAFC', line:'#D7E1E8' };
     const MAX_PARTICIPANTS = 10;
@@ -387,7 +386,11 @@
     async function boot() {
       try {
         runSelfTests(); initPalette(); const initial = parseSearch(); initJoinForm(initial);
-        if (!validateFirebaseConfig(FIREBASE_CONFIG)) throw new Error('Preencha o arquivo firebase-config.js com os dados reais do seu projeto Firebase.');
+        if (!validateFirebaseConfig(FIREBASE_CONFIG)) {
+          const btn = document.getElementById('join-button')
+          if (btn) btn.disabled = true
+          throw new Error('⚠️ Firebase não configurado. Abra o arquivo firebase-config.js e substitua os valores SUA_API_KEY, SEU-PROJETO etc. pelas credenciais reais do seu projeto Firebase. Consulte o README.md para o passo a passo.')
+        }
         clearError(true);
         if (initial.name) { state.name = initial.name; state.room = initial.room; await connectRoom(); toggleScreens(true); render(); }
       } catch (error) { showError(error.message || 'Falha ao inicializar o app.', true); }
