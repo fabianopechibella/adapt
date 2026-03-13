@@ -177,21 +177,31 @@
     const PALETTE = { orange1:'#F78D2A', orange2:'#F7941E', amber:'#FBAE2C', yellow:'#F4D62D', navy:'#003646', blueDeep:'#005265', steel:'#2D789F', cyan:'#1BA2C8', teal:'#1DA0A9', paper:'#F7FAFC', line:'#D7E1E8' };
     const MAX_PARTICIPANTS = 10;
     const DEFAULT_BOARD = {
-      budget: 1000000,
+      budget: 6000000,
       strategicThemes: [
-        { id: 'growth', name: 'Customer Growth', allocation: 320000, color: PALETTE.orange1 },
-        { id: 'risk', name: 'Risk Reduction', allocation: 240000, color: PALETTE.orange2 },
-        { id: 'ops', name: 'Operational Efficiency', allocation: 220000, color: PALETTE.steel },
-        { id: 'innovation', name: 'Innovation', allocation: 220000, color: PALETTE.teal }
+        { id: 'comercial',  name: 'Comercial',         allocation: 1500000, color: PALETTE.orange1 },
+        { id: 'transporte', name: 'Transporte',         allocation: 1500000, color: PALETTE.orange2 },
+        { id: 'cruzamento', name: 'Cruzamento de Vias', allocation: 1500000, color: PALETTE.steel },
+        { id: 'plataforma', name: 'Plataforma',         allocation: 1500000, color: PALETTE.teal }
       ],
       epics: [
-        { id: 'loan-origination', name: 'Loan Origination', cost: 280000, description: 'Originação e processamento do ciclo de empréstimo.', themeId: 'growth', status: 'available' },
-        { id: 'fraud-management', name: 'Fraud Management', cost: 250000, description: 'Redução de fraude, auditoria e segurança.', themeId: 'risk', status: 'available' },
-        { id: 'credit-scoring', name: 'Credit Scoring', cost: 320000, description: 'Capacidade de score para decisão e expansão de crédito.', themeId: 'growth', status: 'funded' },
-        { id: 'explore-fraud-service', name: 'Explore New Fraud Service', cost: 60000, description: 'Protótipo integrado a serviço SaaS de fraude.', themeId: 'risk', status: 'funded' },
-        { id: 'decommission-legacy', name: 'Decommission Legacy Credit System', cost: 100000, description: 'Descomissionamento do legado de crédito.', themeId: 'ops', status: 'funded' },
-        { id: 'move-to-angular', name: 'Move to Angular', cost: 80000, description: 'Modernização da arquitetura front-end.', themeId: 'innovation', status: 'funded' },
-        { id: 'adopt-puppet', name: 'Adopt Puppet', cost: 400000, description: 'Automação e padronização de infraestrutura.', themeId: 'ops', status: 'available' }
+        { id: 'cs1', name: 'C Sol.1: Entrega comercial autônoma por meio de vans',    cost: 2000000, description: 'Solução de entrega comercial autônoma utilizando vans.',                                                                                                  themeId: 'comercial',  status: 'available' },
+        { id: 'c1',  name: 'C1: Expandir para mais idiomas',                          cost:  100000, description: 'Expandir os serviços de entrega para outros idiomas.',                                                                                                   themeId: 'comercial',  status: 'available' },
+        { id: 'c2',  name: 'C2: Gamificação das entregas',                            cost:  500000, description: 'Gamificar o processo de pedido para se titular pedidos.',                                                                                                themeId: 'comercial',  status: 'available' },
+        { id: 'c3',  name: 'C3: Plataforma de entrega por drones',                    cost:  900000, description: 'Fornecer uma Capability para entrega de mantimentos por drones.',                                                                                        themeId: 'comercial',  status: 'available' },
+        { id: 'c4',  name: 'C4: Suporte ao Apple Pay',                                cost:  100000, description: 'Oferecer suporte ao Apple Pay como método de pagamento para entrega.',                                                                                   themeId: 'comercial',  status: 'available' },
+        { id: 'c5',  name: 'C5: Construir um serviço para a Alexa',                   cost:  200000, description: 'Permitir pedidos de voz por meio de dispositivos compatíveis com a Alexa.',                                                                              themeId: 'comercial',  status: 'available' },
+        { id: 'c6',  name: 'C6: Entrega de produtos perecíveis de fazendas locais',   cost:  100000, description: 'Testar a capacidade de entregar mercadorias perecíveis dentro de um determinado intervalo de tempo e distância.',                                         themeId: 'comercial',  status: 'available' },
+        { id: 'c7',  name: 'C7: Sistema de reconhecimento de imagem',                 cost:  700000, description: 'Melhorar os sistemas avançados de controle e reconhecimento de imagem para interpretar informações sensoriais e identificar caminhos de navegação com 90% de precisão.', themeId: 'comercial',  status: 'available' },
+        { id: 'ts1', name: 'T Sol.1: Transporte público autônomo por meio de ônibus', cost: 1000000, description: 'Solução de transporte público autônomo com ônibus.',                                                                                                     themeId: 'transporte', status: 'available' },
+        { id: 't1',  name: 'T1: Mover para o nível autônomo 5',                       cost:  600000, description: 'Possibilitar autonomia do Nível 5 que permitirá entregas para clientes governamentais em condições off-road, abrindo um enorme mercado para a empresa.',  themeId: 'transporte', status: 'available' },
+        { id: 't2',  name: 'T2: Atualizar sensores',                                  cost:  500000, description: 'Atualizar os sensores do veículo para garantir um reconhecimento mais rápido das situações dinâmicas em uma estrada.',                                    themeId: 'transporte', status: 'available' },
+        { id: 't3',  name: 'T3: Melhorar a navegação',                                cost:  300000, description: 'Melhorar as Capabilities de navegação para reduzir o tempo de percurso.',                                                                                themeId: 'transporte', status: 'available' },
+        { id: 't4',  name: 'T4: Capability de detecção de beirada',                   cost:  800000, description: 'Melhorar o sistema de reconhecimento de imagem para permitir a detecção de beiradas em condições de baixa luminosidade e baixo contraste.',              themeId: 'transporte', status: 'available' },
+        { id: 'p1',  name: 'P1: Parceria com a plataforma de entrega',                cost:  700000, description: 'Faça parceria com uma empresa que tenha uma plataforma de entrega. Obs: se financiado, não pode financiar P2 nem P3.',                                   themeId: 'cruzamento', status: 'available' },
+        { id: 'p2',  name: 'P2: Desenvolvimento da plataforma de entrega',             cost:  800000, description: 'Construir uma plataforma de entrega interna. Obs: se financiado, não pode financiar P1.',                                                                themeId: 'cruzamento', status: 'available' },
+        { id: 'p3',  name: 'P3: Integração da gestão de frotas da plataforma',        cost:  200000, description: 'Integrar a nova plataforma com o pacote de gerenciamento de frota. Obs: só pode ser financiado se P2 estiver financiado.',                               themeId: 'cruzamento', status: 'available' },
+        { id: 'p4',  name: 'P4: Continuous Delivery Pipeline',                        cost:  300000, description: 'Permitir a Liberação Sob Demanda de novas Features.',                                                                                                    themeId: 'plataforma', status: 'available' }
       ],
       activity: [{ id: 'seed-1', ts: Date.now(), text: 'Board inicializado com o kit visual do exercício.' }],
       revision: 1,
@@ -222,9 +232,9 @@
       const sample = normalizeBoardForSave(Object.assign(deepClone(DEFAULT_BOARD), { revision: 4 }));
       if (sample.revision !== 5) throw new Error('Teste falhou: revision não incrementou corretamente.');
       const invested = DEFAULT_BOARD.epics.filter(e => e.status === 'funded').reduce((sum, e) => sum + e.cost, 0);
-      if (invested !== 560000) throw new Error('Teste falhou: cálculo de investimento inicial inválido.');
-      const theme = DEFAULT_BOARD.strategicThemes.find(t => t.id === 'growth');
-      if (!theme || theme.color !== PALETTE.orange1) throw new Error('Teste falhou: tema growth inválido.');
+      if (invested !== 0) throw new Error('Teste falhou: cálculo de investimento inicial inválido.');
+      const theme = DEFAULT_BOARD.strategicThemes.find(t => t.id === 'comercial');
+      if (!theme || theme.color !== PALETTE.orange1) throw new Error('Teste falhou: tema comercial inválido.');
     }
 
     function initPalette() { const row = document.getElementById('palette-row'); [PALETTE.orange1, PALETTE.orange2, PALETTE.amber, PALETTE.yellow, PALETTE.navy, PALETTE.blueDeep, PALETTE.steel, PALETTE.cyan, PALETTE.teal].forEach(color => { const el = document.createElement('span'); el.className = 'palette-swatch'; el.style.backgroundColor = color; row.appendChild(el); }); }
