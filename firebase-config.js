@@ -1,11 +1,11 @@
 export const FIREBASE_CONFIG = {
-  apiKey: 'SUA_API_KEY',
-  authDomain: 'SEU-PROJETO.firebaseapp.com',
-  databaseURL: 'https://SEU-PROJETO-default-rtdb.firebaseio.com',
-  projectId: 'SEU-PROJETO',
-  storageBucket: 'SEU-PROJETO.appspot.com',
-  messagingSenderId: 'SEU_MESSAGING_SENDER_ID',
-  appId: 'SEU_APP_ID'
+  apiKey: 'AIzaSyCTmhiI21zlCD89amuEPOLjIF4SnkEjiJ4',
+  authDomain: 'lpm-participatory-budgeting.firebaseapp.com',
+  databaseURL: 'https://lpm-participatory-budgeting-default-rtdb.firebaseio.com',
+  projectId: 'lpm-participatory-budgeting',
+  storageBucket: 'lpm-participatory-budgeting.firebasestorage.app',
+  messagingSenderId: '876127187573',
+  appId: '1:876127187573:web:d08a6b4749e1807e983e3c'
 }
 
 export function validateFirebaseConfig(config) {
