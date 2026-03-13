@@ -152,6 +152,11 @@
                    font-weight: 900; font-size: 13px; border-bottom: none; }
     .tr-total td.td-grand { font-size: 15px; color: #fff; }
 
+    /* Budget summary table */
+    #budget-summary-table { min-width: unset; }
+    .tr-budget-need td { background: var(--navy); color: #fff; font-weight: 900; font-size: 13px; border-bottom: none; }
+    .tr-budget-need.danger td { background: #b91c1c; }
+
     /* Refresh indicator */
     .spin { animation: spin 1s linear infinite; display: inline-block; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -293,6 +298,20 @@
     </table>
   </div>
 
+  <div class="table-wrap" style="max-width:520px;">
+    <table id="budget-summary-table">
+      <thead>
+        <tr>
+          <th class="th-left" style="min-width:340px;">Orçamento</th>
+          <th style="min-width:140px;text-align:right;">Quantia</th>
+        </tr>
+      </thead>
+      <tbody id="budget-summary-body">
+        <tr><td colspan="2" style="text-align:center;padding:20px;color:#94a3b8;">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
   <footer class="footer">
     LPM Participatory Budgeting · Firebase Realtime · Dados sincronizados em tempo real
   </footer>
@@ -391,6 +410,7 @@
     lpmRoom:  '',
     votes:    {},                 // epicId → Set of group indices that funded
     decisions:{},                // epicId → boolean
+    budgets:  {},                 // groupIdx → budget value from each room
     unsubs:   [],
     db: null
   };
@@ -492,6 +512,7 @@
         const board = snapshot.val();
         // Collect funded epic IDs from this room
         if (board && Array.isArray(board.epics)) {
+          if (board.budget) state.budgets[idx] = board.budget;
           board.epics.filter(e => e.status === 'funded').forEach(e => {
             if (!state.votes[e.id]) state.votes[e.id] = new Set();
             state.votes[e.id].add(idx);
@@ -643,6 +664,25 @@
     tbody.querySelectorAll('input[data-id]').forEach(input => {
       input.addEventListener('change', () => toggleDecision(input.dataset.id));
     });
+
+    // Budget summary table
+    const totalBudget = Object.values(state.budgets).reduce((s, v) => s + v, 0);
+    const necessidade = selectedTotal - totalBudget;
+    const summaryBody = $('budget-summary-body');
+    summaryBody.innerHTML = `
+      <tr>
+        <td>Orçamento do portfólio</td>
+        <td style="text-align:right;font-weight:700;color:var(--blueDeep);">${BRL(totalBudget)}</td>
+      </tr>
+      <tr>
+        <td>Custos do projeto do Épico e das operações da Solução</td>
+        <td style="text-align:right;font-weight:700;color:var(--blueDeep);">${BRL(selectedTotal)}</td>
+      </tr>
+      <tr class="tr-budget-need ${necessidade > 0 ? 'danger' : ''}">
+        <td>Necessidade</td>
+        <td style="text-align:right;">${BRL(Math.abs(necessidade))}${necessidade < 0 ? ' (sobra)' : ''}</td>
+      </tr>
+    `;
 
     // Stats bar
     $('stat-total').textContent     = BRL(grandTotal);
