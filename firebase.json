@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "lpm-budget-firebase",
     "public": ".",
     "ignore": [
       "firebase.json",
