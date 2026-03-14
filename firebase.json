@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "lpm-budget-firebase",
+    "site": "lpm-participatory-budgeting",
     "public": ".",
     "ignore": [
       "firebase.json",
