@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LPM — Consolidação de Salas</title>
+  <style>
+    :root {
+      --orange1: #F78D2A; --orange2: #F7941E; --amber: #FBAE2C; --yellow: #F4D62D;
+      --navy: #003646; --blueDeep: #005265; --steel: #2D789F; --cyan: #1BA2C8; --teal: #1DA0A9;
+      --paper: #F7FAFC; --line: #D7E1E8; --text: #334155; --white: #FFFFFF;
+      --okBg: #ECFDF5; --warnBg: #FFF7ED; --dangerBg: #FFF1F2;
+      --shadow: 0 4px 18px rgba(0,52,70,0.08);
+      /* Value-chain accent colors */
+      --vc-comercial: #F78D2A;
+      --vc-transporte: #1BA2C8;
+      --vc-cruzamento: #1DA0A9;
+      --vc-plataforma: #6366F1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Inter, Arial, Helvetica, sans-serif; font-size: 13px; color: var(--text);
+           background: var(--paper); min-height: 100vh; }
+    .hidden { display: none !important; }
+
+    /* ── SETUP SCREEN ──────────────────────────────── */
+    .setup-page { min-height: 100vh; display: grid; place-items: center; padding: 24px;
+                  background: linear-gradient(135deg, #f7fafc, #eef8fb); }
+    .setup-card { background: #fff; border: 1px solid var(--line); border-radius: 28px;
+                  box-shadow: var(--shadow); padding: 40px; max-width: 680px; width: 100%; }
+    .setup-badge { display: inline-flex; gap: 8px; align-items: center; border: 1px solid var(--line);
+                   background: rgba(255,255,255,0.9); color: var(--blueDeep); border-radius: 999px;
+                   padding: 8px 14px; font-weight: 700; font-size: 12px; letter-spacing: .1em;
+                   text-transform: uppercase; margin-bottom: 20px; }
+    .setup-title { color: var(--navy); font-size: 28px; font-weight: 900; line-height: 1.2; }
+    .setup-sub { margin-top: 10px; color: #64748b; font-size: 14px; line-height: 1.55; }
+    .setup-grid { display: grid; gap: 14px; margin-top: 28px; grid-template-columns: 1fr 1fr; }
+    .setup-field label { display: block; font-weight: 700; font-size: 12px; color: var(--navy);
+                         text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; }
+    .setup-field input { width: 100%; border: 1px solid var(--line); border-radius: 14px;
+                         padding: 11px 14px; outline: none; font: inherit; font-size: 13px; }
+    .setup-field input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(27,162,200,0.15); }
+    .setup-field .hint { margin-top: 4px; font-size: 11px; color: #94a3b8; }
+    .setup-actions { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn { border: 0; border-radius: 14px; padding: 12px 20px; font: inherit; font-weight: 800;
+           font-size: 13px; cursor: pointer; transition: transform .15s, box-shadow .15s; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { color: #fff; background: linear-gradient(135deg, var(--orange1), var(--orange2));
+                   box-shadow: 0 8px 20px rgba(247,141,42,0.3); }
+    .btn-secondary { background: #fff; color: var(--blueDeep); border: 1px solid var(--line); }
+    .btn-danger { background: #fff; color: #b91c1c; border: 1px solid #fecdd3; }
+    .btn-sm { padding: 7px 14px; font-size: 12px; border-radius: 10px; }
+    .error-box { margin-top: 14px; background: #fff1f2; color: #9f1239; border: 1px solid #fecdd3;
+                 border-radius: 14px; padding: 12px 14px; font-size: 13px; }
+
+    /* ── TOP BAR ───────────────────────────────────── */
+    .topbar { background: #fff; border-bottom: 1px solid var(--line);
+              padding: 14px 24px; display: flex; justify-content: space-between;
+              align-items: center; gap: 16px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
+    .topbar-left { display: flex; flex-direction: column; gap: 4px; }
+    .topbar-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: #94a3b8; }
+    .topbar-title { font-size: 22px; font-weight: 900; color: var(--navy); }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip { border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 6px; }
+    .chip-green { background: rgba(29,160,169,0.12); color: var(--blueDeep); }
+    .chip-orange { background: rgba(247,141,42,0.12); color: var(--orange1); }
+    .chip-red { background: rgba(239,68,68,0.1); color: #b91c1c; }
+    .topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+    /* ── STATS BAR ─────────────────────────────────── */
+    .statsbar { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+                gap: 12px; padding: 16px 24px; background: #fff;
+                border-bottom: 1px solid var(--line); }
+    .stat-item { display: flex; flex-direction: column; gap: 4px; }
+    .stat-label { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: #94a3b8; }
+    .stat-value { font-size: 22px; font-weight: 900; }
+    .stat-sub { font-size: 11px; color: #64748b; }
+
+    /* ── TABLE WRAPPER ─────────────────────────────── */
+    .table-wrap { overflow-x: auto; padding: 20px 24px; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0;
+            background: #fff; border-radius: 20px; border: 1px solid var(--line);
+            box-shadow: var(--shadow); overflow: hidden; min-width: 1400px; }
+
+    /* Header */
+    thead th { background: var(--navy); color: rgba(255,255,255,0.9);
+               padding: 10px 10px; font-size: 10px; font-weight: 700; letter-spacing: .12em;
+               text-transform: uppercase; text-align: center; white-space: nowrap;
+               border-right: 1px solid rgba(255,255,255,0.08); }
+    thead th.th-left { text-align: left; }
+    thead th.th-accent { background: var(--blueDeep); }
+    thead th.th-vote { background: #1a4a5c; min-width: 62px; }
+    thead th.th-decision { background: linear-gradient(135deg, var(--orange1), var(--orange2)); color: #fff; }
+    thead tr.sub-header th { background: #0d2e3a; font-size: 9px; padding: 6px 10px; }
+
+    /* Body */
+    tbody td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9;
+               border-right: 1px solid #f1f5f9; vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #f8fbfd; }
+
+    /* Value-chain group header */
+    .tr-vc-header td { font-weight: 900; font-size: 12px; color: #fff; padding: 9px 12px;
+                       border-bottom: 1px solid rgba(255,255,255,0.15); border-right: none; }
+    .tr-vc-header.vc-comercial td { background: var(--vc-comercial); }
+    .tr-vc-header.vc-transporte td { background: var(--vc-transporte); }
+    .tr-vc-header.vc-cruzamento td { background: var(--vc-cruzamento); }
+    .tr-vc-header.vc-plataforma td { background: var(--vc-plataforma); }
+
+    /* Epic row */
+    .td-id { font-weight: 900; font-size: 13px; color: var(--navy); width: 44px; text-align: center; }
+    .td-horizon { text-align: center; width: 56px; }
+    .horizon-pill { display: inline-block; border-radius: 8px; padding: 2px 8px;
+                    font-size: 10px; font-weight: 800; letter-spacing: .08em; }
+    .h1 { background: #dcfce7; color: #166534; }
+    .h2 { background: #fef9c3; color: #854d0e; }
+    .h3 { background: #fee2e2; color: #9f1239; }
+    .td-desc { max-width: 340px; min-width: 200px; line-height: 1.45; }
+    .desc-title { font-weight: 700; color: var(--navy); font-size: 12px; }
+    .desc-body { margin-top: 3px; font-size: 11px; color: #64748b; line-height: 1.4; }
+    .td-cost { text-align: right; white-space: nowrap; font-weight: 700;
+               color: var(--blueDeep); min-width: 90px; }
+    .td-vote { text-align: center; width: 62px; }
+    .vote-dot { display: inline-block; width: 26px; height: 26px; border-radius: 50%;
+                font-weight: 800; font-size: 12px; line-height: 26px; text-align: center; }
+    .vote-yes { background: #dcfce7; color: #166534; }
+    .vote-no  { background: #f1f5f9; color: #94a3b8; }
+    .td-total-votes { text-align: center; font-weight: 900; font-size: 15px; min-width: 52px; }
+    .td-parcial { text-align: right; font-weight: 700; color: var(--steel);
+                  white-space: nowrap; min-width: 90px; font-size: 12px; }
+    .td-selected { text-align: center; width: 80px; }
+    .td-selected-value { text-align: right; white-space: nowrap; font-weight: 700;
+                         color: var(--teal); min-width: 90px; }
+
+    /* Toggle switch */
+    .toggle-wrap { display: flex; justify-content: center; }
+    .toggle { position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: #e2e8f0; border-radius: 999px; transition: .2s; }
+    .toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px;
+                              bottom: 3px; background: #fff; border-radius: 50%; transition: .2s; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+    .toggle input:checked + .toggle-slider { background: var(--teal); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    /* Subtotal row */
+    .tr-subtotal td { background: #f8fafc; font-weight: 700; font-size: 12px;
+                      color: var(--blueDeep); border-bottom: 2px solid var(--line); }
+    .tr-subtotal .td-label { text-align: right; color: #64748b; font-style: italic; }
+
+    /* Total row */
+    .tr-total td { background: var(--navy); color: rgba(255,255,255,0.9);
+                   font-weight: 900; font-size: 13px; border-bottom: none; }
+    .tr-total td.td-grand { font-size: 15px; color: #fff; }
+
+    /* Budget summary table */
+    #budget-summary-table { min-width: unset; }
+    .tr-budget-need td { background: var(--navy); color: #fff; font-weight: 900; font-size: 13px; border-bottom: none; }
+    .tr-budget-need.danger td { background: #b91c1c; }
+
+    /* Refresh indicator */
+    .spin { animation: spin 1s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Footer */
+    .footer { padding: 16px 24px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid var(--line); }
+
+    @media print {
+      .topbar, .statsbar, .setup-page { display: none; }
+      .table-wrap { padding: 0; }
+      table { box-shadow: none; border-radius: 0; min-width: unset; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     SETUP SCREEN
+════════════════════════════════════════════════════ -->
+<section id="setup-screen" class="setup-page">
+  <div class="setup-card">
+    <div class="setup-badge">&#9670; LPM | Consolidação de Salas</div>
+    <h1 class="setup-title">Resultados Consolidados das Salas</h1>
+    <p class="setup-sub">Informe os códigos de cada sala (grupo) para carregar os votos em tempo real. Deixe em branco os grupos que não participaram.</p>
+
+    <div class="setup-grid">
+      <div class="setup-field">
+        <label>Grupo 1 — Sala</label>
+        <input id="room-1" type="text" placeholder="Ex.: sala-grupo-1" />
+      </div>
+      <div class="setup-field">
+        <label>Grupo 2 — Sala</label>
+        <input id="room-2" type="text" placeholder="Ex.: sala-grupo-2" />
+      </div>
+      <div class="setup-field">
+        <label>Grupo 3 — Sala</label>
+        <input id="room-3" type="text" placeholder="Ex.: sala-grupo-3" />
+      </div>
+      <div class="setup-field">
+        <label>Grupo 4 — Sala</label>
+        <input id="room-4" type="text" placeholder="Ex.: sala-grupo-4" />
+      </div>
+      <div class="setup-field">
+        <label>Grupo 5 — Sala</label>
+        <input id="room-5" type="text" placeholder="Ex.: sala-grupo-5" />
+        <div class="hint">Pode ficar em branco se o grupo não existir.</div>
+      </div>
+      <div class="setup-field">
+        <label>Sala de Decisão LPM</label>
+        <input id="room-lpm" type="text" placeholder="Ex.: sala-lpm" />
+        <div class="hint">Salva as decisões do facilitador LPM.</div>
+      </div>
+    </div>
+
+    <div class="setup-actions">
+      <button id="start-btn" class="btn btn-primary">Carregar consolidação</button>
+      <button id="demo-btn" class="btn btn-secondary">Usar salas demo</button>
+    </div>
+    <div id="setup-error" class="error-box hidden"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     CONSOLIDATION SCREEN
+════════════════════════════════════════════════════ -->
+<div id="app-screen" class="hidden">
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-eyebrow">Participatory Budgeting · LPM</div>
+      <div class="topbar-title">Resultados consolidados</div>
+      <div class="chips" style="margin-top:6px;">
+        <span id="sync-chip" class="chip chip-green">&#9679; Sincronizando...</span>
+        <span id="rooms-chip" class="chip chip-orange">0 salas ativas</span>
+        <span id="error-chip" class="chip chip-red hidden">Erro de leitura</span>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button id="refresh-btn" class="btn btn-secondary btn-sm">&#8635; Atualizar</button>
+      <button id="print-btn"   class="btn btn-secondary btn-sm">&#128438; Imprimir</button>
+      <button id="back-btn"    class="btn btn-secondary btn-sm">&#8592; Salas</button>
+    </div>
+  </header>
+
+  <div class="statsbar">
+    <div class="stat-item">
+      <div class="stat-label">Total do Portfólio</div>
+      <div class="stat-value" id="stat-total" style="color:var(--orange1);">—</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Selecionado (LPM)</div>
+      <div class="stat-value" id="stat-selected" style="color:var(--teal);">—</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Restante</div>
+      <div class="stat-value" id="stat-remaining" style="color:var(--steel);">—</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Épicos selecionados</div>
+      <div class="stat-value" id="stat-count" style="color:var(--blueDeep);">—</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Salas conectadas</div>
+      <div class="stat-value" id="stat-rooms" style="color:var(--navy);">—</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Última atualização</div>
+      <div class="stat-value" id="stat-updated" style="color:#64748b;font-size:14px;">—</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table id="consolidation-table">
+      <thead>
+        <tr>
+          <th class="th-left" rowspan="2" style="min-width:140px;">Cadeia de Valor</th>
+          <th rowspan="2" style="width:44px;">Épico</th>
+          <th rowspan="2" style="width:56px;">Horizonte</th>
+          <th class="th-left" rowspan="2" style="min-width:260px;">Descrição do Épico</th>
+          <th rowspan="2" style="min-width:90px;">Est. Gasto</th>
+          <th class="th-accent" colspan="5">Votos</th>
+          <th class="th-accent" rowspan="2" style="min-width:52px;">Total</th>
+          <th rowspan="2" style="min-width:90px;">Parcial</th>
+          <th class="th-decision" colspan="2">Decisão do LPM</th>
+        </tr>
+        <tr class="sub-header">
+          <th class="th-vote" id="th-g1">Grupo 1</th>
+          <th class="th-vote" id="th-g2">Grupo 2</th>
+          <th class="th-vote" id="th-g3">Grupo 3</th>
+          <th class="th-vote" id="th-g4">Grupo 4</th>
+          <th class="th-vote" id="th-g5">Grupo 5</th>
+          <th class="th-decision" style="min-width:80px;">Selecionado</th>
+          <th class="th-decision" style="min-width:90px;">$ Selecionado</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <tr><td colspan="14" style="text-align:center;padding:40px;color:#94a3b8;">Carregando dados das salas...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap" style="max-width:520px;">
+    <table id="budget-summary-table">
+      <thead>
+        <tr>
+          <th class="th-left" style="min-width:340px;">Orçamento</th>
+          <th style="min-width:140px;text-align:right;">Quantia</th>
+        </tr>
+      </thead>
+      <tbody id="budget-summary-body">
+        <tr><td colspan="2" style="text-align:center;padding:20px;color:#94a3b8;">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="footer">
+    LPM Participatory Budgeting · Firebase Realtime · Dados sincronizados em tempo real
+  </footer>
+</div>
+
+<script type="module">
+  import { FIREBASE_CONFIG, validateFirebaseConfig } from './firebase-config.js'
+  import { initializeApp }    from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js'
+  import { getDatabase, ref, set, get, onValue } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js'
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // EPIC CATALOG  (edit here to match your workshop's epics)
+  // ─────────────────────────────────────────────────────────────────────────────
+  const CATALOG = [
+    {
+      vcId: 'comercial', vcLabel: 'Comercial', vcClass: 'vc-comercial',
+      sectionLabel: 'C — Seção 1 — Entrega cross-selling por mais de uma pessoa',
+      epics: [
+        { id:'c1', code:'C1', horizon:'H1', title:'Expandir serviços de entrega para outros idiomas',
+          desc:'Ganhar novos clientes expandindo a Capability de entrega com plataforma multilíngue para outros idiomas.',
+          cost: 100000 },
+        { id:'c2', code:'C2', horizon:'H1', title:'Gamificação de pedidos',
+          desc:'Aumentar a frequência e volume de pedidos com mecânicas de gamificação integradas ao aplicativo.',
+          cost: 500000 },
+        { id:'c3', code:'C3', horizon:'H2', title:'Plataforma de orçamento para armazenamento de bônus',
+          desc:'Armazenar e gerenciar bônus, créditos e carteiras digitais de clientes na plataforma.',
+          cost: 100000 },
+        { id:'c4', code:'C4', horizon:'H1', title:'Suporte ao Apple Pay',
+          desc:'Oferecer suporte ao Apple Pay como método de pagamento para entrega na plataforma.',
+          cost: 100000 },
+        { id:'c5', code:'C5', horizon:'H2', title:'Seleção de clientes com assistentes de voz',
+          desc:'Testar a Capability de selecionar e executar pedidos de um determinado intervalo de tempo e distância com assistentes de voz.',
+          cost: 300000 },
+        { id:'c6', code:'C6', horizon:'H2', title:'Entrega de pagamentos pelos motoristas de plataformas locais',
+          desc:'Múltiplas integrações de pagamentos compatíveis com motoristas e plataformas de pagamento locais.',
+          cost: 100000 },
+        { id:'c7', code:'C7', horizon:'H3', title:'Sistema de reconhecimento de imagens de navegação',
+          desc:'Capability de reconhecimento de imagens para interpretar informações sensoriais e identificar caminhos de navegação com 80% de precisão.',
+          cost: 700000 },
+      ]
+    },
+    {
+      vcId: 'transporte', vcLabel: 'Transporte', vcClass: 'vc-transporte',
+      sectionLabel: 'T — Seção 1 — Transporte autônomo dentro de mais de uma frota',
+      epics: [
+        { id:'t1', code:'T1', horizon:'H2', title:'Mover para carro nível autônomo B',
+          desc:'Possibilitar autonomia do Nível 1, que permitirá entregar carros governamentais já obtidos no novo mercado para a empresa.',
+          cost: 600000 },
+        { id:'t2', code:'T2', horizon:'H1', title:'Alertas e recomendações de condução',
+          desc:'Analisar os sensores do veículo para gerar reconhecimento em situ após situações delicadas em uma entrada.',
+          cost: 300000 },
+        { id:'t3', code:'T3', horizon:'H1', title:'Melhoria na navegação',
+          desc:'Melhorar a Capability de navegação do rastreador de modo a ter menor tempo de percurso.',
+          cost: 200000 },
+        { id:'t4', code:'T4', horizon:'H2', title:'Capability de detecção de levada',
+          desc:'Melhorar a exatidão de reconhecimento de imagem para detectar levadas de baixa luminância com alta precisão e levar contratos a práticas.',
+          cost: 600000 },
+      ]
+    },
+    {
+      vcId: 'cruzamento', vcLabel: 'Cruzamento de Vías', vcClass: 'vc-cruzamento',
+      sectionLabel: 'P — Seção 1 — Plataforma de entrega unificada',
+      epics: [
+        { id:'p1', code:'P1', horizon:'H1', title:'Plataforma de entrega',
+          desc:'Melhorar a exatidão de reconhecimento de imagem, para permitir a detecção de levadas. Obs: você só financiará a "Plataforma de entrega" caso você também financie a "Integração de gerenciamento de frete". Caso você financie o "Desenvolvimento da plataforma de entrega" mas não financie a "Plataforma de entrega", você estará financiando o "Desenvolvimento da plataforma de entrega". Imaginar: Você irá financiar tanto o "Desenvolvimento da plataforma de entrega" como o pacote de gerenciamento de frete. Observação: Você só irá financiar isso se você financiar o "Desenvolvimento da plataforma de entrega".',
+          cost: 300000 },
+        { id:'p2', code:'P2', horizon:'H1', title:'Desenvolvimento da plataforma de entrega',
+          desc:'Desenvolvimento completo da plataforma de entrega; não financiará a "Plataforma de entrega" caso você não financie também a "Integração de gerenciamento de frete".',
+          cost: 300000 },
+        { id:'p3', code:'P3', horizon:'H2', title:'Integração de gestão de frete da plataforma de entrega',
+          desc:'Integrar gestão de entrega com pacote de gerenciamento de frete. Obs: Você só irá financiar isso se você financiar o "Desenvolvimento da plataforma de entrega".',
+          cost: 300000 },
+        { id:'p4', code:'P4', horizon:'H1', title:'Continuos Delivery Pipeline',
+          desc:'Permitir a construção Sem Dívida de novas Features, garantindo qualidade e velocidade de entrega contínua.',
+          cost: 500000 },
+      ]
+    }
+  ];
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // HELPERS
+  // ─────────────────────────────────────────────────────────────────────────────
+  const BRL = v => new Intl.NumberFormat('pt-BR',{ style:'currency', currency:'BRL', maximumFractionDigits:0 }).format(v||0);
+  const uid = () => Math.random().toString(36).slice(2,9);
+  const $ = id => document.getElementById(id);
+
+  // Map epicId → cost for quick lookup
+  const COST_MAP = {};
+  CATALOG.forEach(vc => vc.epics.forEach(e => { COST_MAP[e.id] = e.cost; }));
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // STATE
+  // ─────────────────────────────────────────────────────────────────────────────
+  const state = {
+    rooms:    ['','','','',''],   // room codes per group (index 0-4)
+    lpmRoom:  '',
+    votes:    {},                 // epicId → Set of group indices that funded
+    decisions:{},                // epicId → boolean
+    budgets:  {},                 // groupIdx → budget value from each room
+    unsubs:   [],
+    db: null
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // SETUP SCREEN
+  // ─────────────────────────────────────────────────────────────────────────────
+  function initSetup() {
+    // Pre-fill from URL params
+    const p = new URLSearchParams(window.location.search);
+    for (let i = 1; i <= 5; i++) {
+      const v = p.get('g' + i);
+      if (v) $('room-' + i).value = v;
+    }
+    if (p.get('lpm')) $('room-lpm').value = p.get('lpm');
+
+    $('start-btn').addEventListener('click', startConsolidation);
+    $('demo-btn').addEventListener('click', () => {
+      for (let i = 1; i <= 5; i++) $('room-' + i).value = 'demo-grupo-' + i;
+      $('room-lpm').value = 'demo-lpm';
+      startConsolidation();
+    });
+    $('back-btn').addEventListener('click', () => {
+      state.unsubs.forEach(fn => fn && fn());
+      state.unsubs = [];
+      $('app-screen').classList.add('hidden');
+      $('setup-screen').classList.remove('hidden');
+    });
+    $('refresh-btn').addEventListener('click', () => {
+      state.unsubs.forEach(fn => fn && fn());
+      state.unsubs = [];
+      state.votes = {};
+      attachListeners();
+    });
+    $('print-btn').addEventListener('click', () => window.print());
+  }
+
+  async function startConsolidation() {
+    $('setup-error').classList.add('hidden');
+    const rooms = [];
+    for (let i = 1; i <= 5; i++) rooms.push($('room-' + i).value.trim());
+    const lpmRoom = $('room-lpm').value.trim();
+
+    if (rooms.every(r => !r)) {
+      $('setup-error').textContent = 'Informe ao menos o código de uma sala.';
+      $('setup-error').classList.remove('hidden');
+      return;
+    }
+
+    if (!validateFirebaseConfig(FIREBASE_CONFIG)) {
+      $('setup-error').textContent = '⚠️ Firebase não configurado. Abra firebase-config.js e substitua os valores de placeholder.';
+      $('setup-error').classList.remove('hidden');
+      return;
+    }
+
+    if (!state.db) {
+      const app = initializeApp(FIREBASE_CONFIG);
+      state.db = getDatabase(app);
+    }
+
+    state.rooms   = rooms;
+    state.lpmRoom = lpmRoom;
+    state.votes   = {};
+    state.decisions = {};
+
+    // Update URL
+    const params = new URLSearchParams();
+    rooms.forEach((r, i) => { if (r) params.set('g' + (i+1), r); });
+    if (lpmRoom) params.set('lpm', lpmRoom);
+    window.history.replaceState({}, '', window.location.pathname + '?' + params.toString());
+
+    // Update column headers
+    rooms.forEach((r, i) => {
+      $('th-g' + (i+1)).textContent = r ? 'Grupo ' + (i+1) : '—';
+    });
+
+    $('setup-screen').classList.add('hidden');
+    $('app-screen').classList.remove('hidden');
+
+    // Load LPM decisions first, then attach vote listeners
+    if (lpmRoom) await loadDecisions();
+    attachListeners();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // FIREBASE: LISTEN TO VOTES
+  // ─────────────────────────────────────────────────────────────────────────────
+  function attachListeners() {
+    $('sync-chip').innerHTML = '<span class="spin">&#8635;</span> Sincronizando...';
+    $('error-chip').classList.add('hidden');
+
+    let activeRooms = 0;
+    state.rooms.forEach((roomCode, idx) => {
+      if (!roomCode) return;
+      activeRooms++;
+
+      const boardRef = ref(state.db, `rooms/${roomCode}/boardState`);
+      const unsub = onValue(boardRef, snapshot => {
+        const board = snapshot.val();
+        // Collect funded epic IDs from this room
+        if (board && Array.isArray(board.epics)) {
+          if (board.budget) state.budgets[idx] = board.budget;
+          board.epics.filter(e => e.status === 'funded').forEach(e => {
+            if (!state.votes[e.id]) state.votes[e.id] = new Set();
+            state.votes[e.id].add(idx);
+          });
+          // Clear any epics this room previously funded but no longer does
+          const fundedIds = new Set(board.epics.filter(e => e.status === 'funded').map(e => e.id));
+          Object.keys(state.votes).forEach(epicId => {
+            if (!fundedIds.has(epicId)) state.votes[epicId]?.delete(idx);
+          });
+        } else {
+          // Room has no board — remove all votes from this group
+          Object.values(state.votes).forEach(s => s.delete(idx));
+        }
+        renderTable();
+      }, err => {
+        console.warn('Erro ao ler sala', roomCode, err);
+        $('error-chip').classList.remove('hidden');
+      });
+      state.unsubs.push(unsub);
+    });
+
+    $('rooms-chip').textContent = activeRooms + ' sala' + (activeRooms !== 1 ? 's' : '') + ' ativa' + (activeRooms !== 1 ? 's' : '');
+    $('stat-rooms').textContent = activeRooms;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // FIREBASE: LPM DECISIONS
+  // ─────────────────────────────────────────────────────────────────────────────
+  async function loadDecisions() {
+    if (!state.lpmRoom) return;
+    try {
+      const snap = await get(ref(state.db, `rooms/${state.lpmRoom}/lpmDecisions`));
+      if (snap.exists()) state.decisions = snap.val() || {};
+    } catch(_) {}
+  }
+
+  async function saveDecisions() {
+    if (!state.lpmRoom) return;
+    try {
+      await set(ref(state.db, `rooms/${state.lpmRoom}/lpmDecisions`), state.decisions);
+    } catch(_) {}
+  }
+
+  function toggleDecision(epicId) {
+    state.decisions[epicId] = !state.decisions[epicId];
+    saveDecisions();
+    renderTable();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // RENDER
+  // ─────────────────────────────────────────────────────────────────────────────
+  function renderTable() {
+    const tbody = $('table-body');
+    tbody.innerHTML = '';
+
+    let partialTotal   = 0;   // running total for "Parcial" column (selected by LPM)
+    let grandTotal     = 0;   // sum of all epic costs in catalog
+    let selectedTotal  = 0;
+    let selectedCount  = 0;
+
+    CATALOG.forEach(vc => {
+      // Value-chain group header
+      const trHdr = document.createElement('tr');
+      trHdr.className = 'tr-vc-header ' + vc.vcClass;
+      trHdr.innerHTML = `<td colspan="14">${vc.sectionLabel} &nbsp;|&nbsp; <strong>${vc.vcLabel}</strong></td>`;
+      tbody.appendChild(trHdr);
+
+      let vcSelected = 0;
+
+      vc.epics.forEach(epic => {
+        grandTotal += epic.cost;
+
+        // votes
+        const groupVotes = state.votes[epic.id] || new Set();
+        const totalVotes = groupVotes.size;
+
+        // LPM decision
+        const selected = !!state.decisions[epic.id];
+        if (selected) {
+          partialTotal  += epic.cost;
+          selectedTotal += epic.cost;
+          selectedCount++;
+          vcSelected    += epic.cost;
+        }
+
+        const tr = document.createElement('tr');
+
+        // Build vote cells
+        let voteCells = '';
+        state.rooms.forEach((r, idx) => {
+          if (!r) {
+            voteCells += `<td class="td-vote" style="color:#e2e8f0;text-align:center;">—</td>`;
+          } else {
+            const voted = groupVotes.has(idx);
+            voteCells += `<td class="td-vote"><span class="vote-dot ${voted?'vote-yes':'vote-no'}">${voted?'&#10003;':'&middot;'}</span></td>`;
+          }
+        });
+
+        const horizClass = epic.horizon.toLowerCase();
+
+        tr.innerHTML = `
+          <td></td>
+          <td class="td-id">${epic.code}</td>
+          <td class="td-horizon"><span class="horizon-pill ${horizClass}">${epic.horizon}</span></td>
+          <td class="td-desc">
+            <div class="desc-title">${epic.title}</div>
+            <div class="desc-body">${epic.desc}</div>
+          </td>
+          <td class="td-cost">${BRL(epic.cost)}</td>
+          ${voteCells}
+          <td class="td-total-votes" style="color:${totalVotes>0?'var(--teal)':'#cbd5e1'};">${totalVotes||'&middot;'}</td>
+          <td class="td-parcial">${selected ? BRL(partialTotal) : '—'}</td>
+          <td class="td-selected">
+            <label class="toggle">
+              <input type="checkbox" data-id="${epic.id}" ${selected?'checked':''} />
+              <span class="toggle-slider"></span>
+            </label>
+          </td>
+          <td class="td-selected-value">${selected ? BRL(epic.cost) : '—'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Subtotal per value chain
+      const trSub = document.createElement('tr');
+      trSub.className = 'tr-subtotal';
+      trSub.innerHTML = `
+        <td colspan="4" class="td-label">Subtotal ${vc.vcLabel}</td>
+        <td class="td-cost">${BRL(vc.epics.reduce((s,e)=>s+e.cost,0))}</td>
+        <td colspan="7"></td>
+        <td class="td-selected-value" style="color:var(--teal);">${vcSelected ? BRL(vcSelected) : '—'}</td>
+      `;
+      tbody.appendChild(trSub);
+    });
+
+    // Grand total row
+    const trTotal = document.createElement('tr');
+    trTotal.className = 'tr-total';
+    trTotal.innerHTML = `
+      <td colspan="4" style="text-align:right;padding-right:16px;opacity:0.7;">TOTAL PORTFÓLIO</td>
+      <td class="td-grand" style="text-align:right;">${BRL(grandTotal)}</td>
+      <td colspan="7"></td>
+      <td class="td-grand" style="text-align:right;">${BRL(selectedTotal)}</td>
+    `;
+    tbody.appendChild(trTotal);
+
+    // Wire up toggles
+    tbody.querySelectorAll('input[data-id]').forEach(input => {
+      input.addEventListener('change', () => toggleDecision(input.dataset.id));
+    });
+
+    // Budget summary table
+    const totalBudget = Object.values(state.budgets).reduce((s, v) => s + v, 0);
+    const necessidade = selectedTotal - totalBudget;
+    const summaryBody = $('budget-summary-body');
+    summaryBody.innerHTML = `
+      <tr>
+        <td>Orçamento do portfólio</td>
+        <td style="text-align:right;font-weight:700;color:var(--blueDeep);">${BRL(totalBudget)}</td>
+      </tr>
+      <tr>
+        <td>Custos do projeto do Épico e das operações da Solução</td>
+        <td style="text-align:right;font-weight:700;color:var(--blueDeep);">${BRL(selectedTotal)}</td>
+      </tr>
+      <tr class="tr-budget-need ${necessidade > 0 ? 'danger' : ''}">
+        <td>Necessidade</td>
+        <td style="text-align:right;">${BRL(Math.abs(necessidade))}${necessidade < 0 ? ' (sobra)' : ''}</td>
+      </tr>
+    `;
+
+    // Stats bar
+    $('stat-total').textContent     = BRL(grandTotal);
+    $('stat-selected').textContent  = BRL(selectedTotal);
+    $('stat-remaining').textContent = BRL(grandTotal - selectedTotal);
+    $('stat-count').textContent     = selectedCount + ' épico' + (selectedCount !== 1 ? 's' : '');
+    $('stat-updated').textContent   = new Date().toLocaleTimeString('pt-BR');
+    $('sync-chip').textContent      = '● Sincronizado';
+    $('sync-chip').className        = 'chip chip-green';
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // BOOT
+  // ─────────────────────────────────────────────────────────────────────────────
+  initSetup();
+</script>
+</body>
+</html>

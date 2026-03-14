@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LPM Participatory Budgeting — Firebase</title>
+  <style>
+    :root {
+      --orange1: #F78D2A; --orange2: #F7941E; --amber: #FBAE2C; --yellow: #F4D62D;
+      --navy: #003646; --blueDeep: #005265; --steel: #2D789F; --cyan: #1BA2C8; --teal: #1DA0A9;
+      --paper: #F7FAFC; --line: #D7E1E8; --text: #334155; --white: #FFFFFF;
+      --dangerBg: #FFF4EE; --okBg: #ECFDF5; --warnBg: #FFF7ED;
+      --shadow: 0 10px 30px rgba(0, 52, 70, 0.08); --radius-xl: 28px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, Arial, Helvetica, sans-serif; color: var(--text); background: linear-gradient(180deg, #ffffff, var(--paper)); }
+    .hidden { display: none !important; }
+    .page { max-width: 1600px; margin: 0 auto; padding: 24px; }
+    .hero-page { min-height: 100vh; background: linear-gradient(135deg, var(--paper), #ffffff 55%, #eef8fb); display: grid; align-items: center; padding: 24px; }
+    .hero-grid { max-width: 1200px; width: 100%; margin: 0 auto; display: grid; gap: 32px; grid-template-columns: 1.15fr 0.85fr; }
+    .hero-badge { display: inline-flex; gap: 8px; align-items: center; border: 1px solid var(--line); background: rgba(255,255,255,0.82); color: var(--blueDeep); border-radius: 999px; padding: 10px 16px; font-weight: 700; font-size: 14px; }
+    .hero-title { color: var(--navy); font-size: 52px; line-height: 1.05; margin: 24px 0 0; font-weight: 900; }
+    .hero-text { max-width: 760px; font-size: 20px; line-height: 1.6; margin-top: 20px; }
+    .palette-row { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 12px; }
+    .palette-swatch { width: 48px; height: 48px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.05); box-shadow: var(--shadow); }
+    .card { background: var(--white); border: 1px solid var(--line); border-radius: 32px; box-shadow: var(--shadow); }
+    .entry-card { padding: 24px; }
+    .eyebrow { text-transform: uppercase; letter-spacing: 0.18em; font-size: 12px; font-weight: 700; color: #64748b; }
+    label { display: block; margin-bottom: 8px; color: var(--navy); font-weight: 700; font-size: 14px; }
+    input, button { font: inherit; }
+    input[type="text"], input[type="number"] { width: 100%; border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; outline: none; background: #fff; }
+    .stack { display: grid; gap: 16px; }
+    .btn { border: 0; border-radius: 18px; padding: 14px 18px; font-weight: 800; cursor: pointer; transition: transform .15s ease; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { color: #fff; background: linear-gradient(135deg, var(--orange1), var(--orange2)); box-shadow: 0 12px 24px rgba(247, 141, 42, 0.25); }
+    .btn-secondary { background: #fff; color: var(--blueDeep); border: 1px solid var(--line); }
+    .btn-dark { background: var(--navy); color: #fff; }
+    .topbar { padding: 20px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .room-title { margin: 4px 0 0; color: var(--navy); font-size: 34px; font-weight: 900; }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .chip { border-radius: 999px; padding: 8px 12px; font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
+    .chip-yellow { background: rgba(244,214,45,0.33); color: var(--navy); }
+    .chip-green { background: rgba(29,160,169,0.14); color: var(--blueDeep); }
+    .chip-orange { background: rgba(247,141,42,0.14); color: var(--orange1); }
+    .chip-red { background: rgba(239,68,68,0.12); color: #b91c1c; }
+    .main-grid { margin-top: 20px; display: grid; gap: 16px; grid-template-columns: 1.1fr 2fr 1fr; }
+    .column { display: grid; gap: 16px; }
+    .stat-card, .panel { border: 1px solid var(--line); border-radius: var(--radius-xl); background: #fff; box-shadow: var(--shadow); }
+    .stat-card { padding: 16px; }
+    .stat-label { font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #64748b; }
+    .stat-value { font-size: 32px; font-weight: 900; margin-top: 10px; }
+    .panel { padding: 16px; }
+    .theme-box { border: 1px solid rgba(0,0,0,0.08); border-radius: 18px; padding: 12px; margin-top: 12px; }
+    .theme-pill { display: inline-block; color: #fff; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; }
+    .allocation-note { margin-top: 16px; border-radius: 18px; padding: 12px 14px; font-size: 14px; font-weight: 700; }
+    .board-grid { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
+    .drop-column { min-height: 520px; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--radius-xl); background: #fff; box-shadow: var(--shadow); padding: 16px; }
+    .drop-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 16px; }
+    .drop-title { font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #64748b; }
+    .drop-desc { margin-top: 6px; font-size: 14px; color: #64748b; }
+    .drop-total { color: #fff; border-radius: 18px; padding: 10px 12px; font-size: 14px; font-weight: 900; white-space: nowrap; }
+    .epic-list { display: grid; gap: 12px; flex: 1; }
+    .epic-card { border: 1px solid var(--line); border-radius: 24px; background: #fff; padding: 16px; box-shadow: var(--shadow); cursor: grab; }
+    .epic-card.dragging { opacity: 0.65; }
+    .epic-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+    .epic-name { color: var(--navy); font-size: 18px; font-weight: 900; margin-top: 8px; }
+    .epic-desc { margin-top: 8px; font-size: 14px; color: #64748b; line-height: 1.45; }
+    .epic-cost { color: #fff; border-radius: 18px; padding: 10px 12px; font-size: 14px; font-weight: 900; min-width: 90px; text-align: center; }
+    .epic-card.blocked { opacity: 0.5; cursor: not-allowed; }
+    .epic-card.blocked .epic-name { color: #94a3b8; }
+    .block-badge { display: inline-flex; align-items: center; gap: 4px; background: #fef2f2; color: #b91c1c;
+                   border: 1px solid #fecdd3; border-radius: 999px; padding: 3px 10px; font-size: 11px; font-weight: 700; margin-top: 8px; }
+    .constraint-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+                        background: #b91c1c; color: #fff; border-radius: 18px; padding: 14px 22px;
+                        font-size: 14px; font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+                        z-index: 9999; max-width: 480px; text-align: center;
+                        animation: slideUp .2s ease; pointer-events: none; }
+    @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(12px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    .epic-actions { margin-top: 16px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+    .epic-hint { font-size: 11px; text-transform: uppercase; letter-spacing: .16em; color: #94a3b8; font-weight: 700; }
+    .empty-state { display: grid; place-items: center; flex: 1; text-align: center; border: 2px dashed rgba(29,160,169,0.35); background: #F1FBFB; border-radius: 28px; padding: 24px; }
+    .empty-title { color: var(--blueDeep); font-size: 18px; font-weight: 900; }
+    .empty-text { margin-top: 8px; color: #64748b; font-size: 14px; }
+    .presence-item, .activity-item { border: 1px solid var(--line); border-radius: 18px; padding: 12px 14px; }
+    .presence-item { display: flex; gap: 12px; align-items: center; }
+    .presence-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .presence-name { color: var(--navy); font-weight: 800; }
+    .activity-item { font-size: 14px; color: #64748b; }
+    .facilitator { border-radius: 28px; padding: 16px; color: rgba(255,255,255,0.95); background: linear-gradient(135deg, var(--navy), var(--blueDeep)); }
+    .facilitator .eyebrow { color: rgba(255,255,255,0.7); }
+    .facilitator-step { margin-top: 12px; font-size: 14px; }
+    .error-box { margin-top: 16px; background: #fff1f2; color: #9f1239; border: 1px solid #fecdd3; border-radius: 18px; padding: 14px 16px; line-height: 1.45; font-size: 14px; }
+    .small-note { font-size: 13px; color: #64748b; line-height: 1.5; }
+    @media (max-width: 1200px) { .main-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 980px) { .hero-grid, .board-grid { grid-template-columns: 1fr; } .hero-title { font-size: 40px; } }
+
+    /* Horizon badge */
+    .horizon-badge { display:inline-flex; align-items:center; border-radius:999px; padding:3px 9px; font-size:11px; font-weight:800; letter-spacing:.08em; margin-right:6px; }
+    .hz-H1 { background:rgba(29,160,169,0.14); color:#006e7a; }
+    .hz-H2 { background:rgba(45,120,159,0.14); color:#1d5c7a; }
+    .hz-H3 { background:rgba(251,174,44,0.20); color:#8a6200; }
+
+    /* Solution epic card */
+    .epic-card.solution { border-left:4px solid var(--orange1); background:linear-gradient(135deg,#fffdf8,#fff); }
+    .sol-badge { display:inline-flex; align-items:center; gap:4px; background:rgba(247,141,42,0.12); color:var(--orange1); border:1px solid rgba(247,141,42,0.3); border-radius:999px; padding:3px 10px; font-size:11px; font-weight:800; margin-top:6px; }
+
+    /* Guardrail panel */
+    .guardrail-row { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; padding:10px 0; border-bottom:1px solid #f1f5f9; }
+    .guardrail-row:last-child { border-bottom:none; padding-bottom:0; }
+    .guardrail-label { font-size:13px; font-weight:700; color:var(--navy); }
+    .guardrail-val { font-size:12px; color:#64748b; margin-top:2px; }
+    .guardrail-hint { font-size:10px; color:#94a3b8; margin-top:2px; }
+    .gstatus-ok   { color:#047857; font-weight:800; font-size:13px; white-space:nowrap; }
+    .gstatus-warn { color:var(--orange1); font-weight:800; font-size:13px; white-space:nowrap; }
+    .gstatus-fail { color:#b91c1c; font-weight:800; font-size:13px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+  <section id="join-screen" class="hero-page">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-badge">Dinâmica LPM | Participatory Budgeting</div>
+        <h1 class="hero-title">Board colaborativo com Firebase para o exercício do treinamento LPM da SAI.</h1>
+        <p class="hero-text">Entre em uma sala, compartilhe o link com o grupo e conduza a negociação de orçamento em tempo real. Esta versão usa HTML, CSS, JavaScript puro e Firebase Realtime Database para sincronização e presença.</p>
+        <div class="palette-row" id="palette-row"></div>
+      </div>
+      <div class="card entry-card">
+        <div class="eyebrow">Entrar na sala</div>
+        <div class="stack" style="margin-top:20px;">
+          <div><label for="join-name">Seu nome</label><input id="join-name" type="text" placeholder="Ex.: Fabiano" /></div>
+          <div><label for="join-room">Código da sala</label><input id="join-room" type="text" /></div>
+          <button id="join-button" class="btn btn-primary">Entrar e iniciar dinâmica</button>
+          <div class="small-note">Até 10 pessoas simultâneas por sala. Preencha o arquivo <strong>firebase-config.js</strong> antes de rodar.</div>
+          <div id="boot-error" class="error-box hidden"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <main id="app-screen" class="page hidden">
+    <section class="card topbar">
+      <div>
+        <div class="eyebrow">Participatory Budgeting | LPM</div>
+        <h1 class="room-title" id="room-title"></h1>
+        <div class="chips">
+          <span class="chip chip-yellow" id="mode-chip"></span>
+          <span class="chip chip-green" id="sync-chip"></span>
+          <span class="chip chip-orange hidden" id="limit-chip">Limite recomendado excedido</span>
+          <span class="chip chip-red hidden" id="error-chip">Erro de sincronização</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button id="share-button" class="btn btn-secondary">Compartilhar sala</button>
+        <button id="consolidation-button" class="btn btn-secondary">&#128202; Ver Consolidado</button>
+        <button id="reset-button" class="btn btn-dark">Reiniciar board</button>
+      </div>
+    </section>
+    <section class="main-grid">
+      <div class="column">
+        <div class="stat-card" style="background:#FFF8F1;"><div class="stat-label">Portfolio Budget</div><div class="stat-value" id="budget-stat" style="color:var(--orange1);"></div></div>
+        <div class="stat-card" style="background:#F1FBFB;"><div class="stat-label">Investido</div><div class="stat-value" id="invested-stat" style="color:var(--teal);"></div></div>
+        <div class="stat-card" id="balance-card"><div class="stat-label">Saldo</div><div class="stat-value" id="balance-stat"></div></div>
+        <div class="stat-card" style="background:#F3F8FC;"><div class="stat-label">Participantes</div><div class="stat-value" id="participants-stat" style="color:var(--steel);"></div></div>
+        <div class="panel">
+          <div class="eyebrow">Contexto e orçamento</div>
+          <div style="margin-top:16px;"><label for="budget-input">Budget total</label><input id="budget-input" type="number" /></div>
+          <div id="themes-container" style="margin-top:16px;"></div>
+          <div id="allocation-note" class="allocation-note"></div>
+          <div id="runtime-error" class="error-box hidden"></div>
+        </div>
+      </div>
+      <div class="board-grid">
+        <div class="drop-column" id="available-column" data-status="available">
+          <div class="drop-head"><div><div class="drop-title">Available Epics</div><div class="drop-desc">Iniciativas disponíveis para negociação.</div></div><div class="drop-total" style="background:var(--orange1);" id="available-total"></div></div>
+          <div class="epic-list" id="available-list"></div>
+        </div>
+        <div class="drop-column" id="funded-column" data-status="funded">
+          <div class="drop-head"><div><div class="drop-title">Funded Initiatives</div><div class="drop-desc">Portfólio financiado dentro do envelope de orçamento.</div></div><div class="drop-total" style="background:var(--teal);" id="funded-total"></div></div>
+          <div class="epic-list" id="funded-list"></div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="panel"><div class="eyebrow">Participantes online</div><div id="presence-list" class="stack" style="margin-top:16px;"></div></div>
+        <div class="panel" id="guardrail-panel"><div class="eyebrow" style="margin-bottom:12px;">Guardrails</div><div id="guardrail-rows"></div></div>
+        <div class="panel"><div class="eyebrow">Atividade recente</div><div id="activity-list" class="stack" style="margin-top:16px;"></div></div>
+        <div class="facilitator">
+          <div class="eyebrow">Guia do facilitador</div>
+          <div class="facilitator-step"><strong>1.</strong> Explique o budget e a regra de não exceder o limite.</div>
+          <div class="facilitator-step"><strong>2.</strong> Peça que cada stakeholder defenda suas iniciativas.</div>
+          <div class="facilitator-step"><strong>3.</strong> Negocie trade-offs, movendo cards entre as colunas.</div>
+          <div class="facilitator-step"><strong>4.</strong> Feche o portfólio e faça o debrief final.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script type="module">
+    import { FIREBASE_CONFIG, validateFirebaseConfig } from './firebase-config.js'
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js'
+    import {
+      getDatabase, ref, set, get, onValue, onDisconnect
+    } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js'
+
+    let app, db
+    try {
+      app = initializeApp(FIREBASE_CONFIG)
+      db = getDatabase(app)
+    } catch (_) { /* config inválido — boot() vai exibir o erro */ }
+
+    const PALETTE = { orange1:'#F78D2A', orange2:'#F7941E', amber:'#FBAE2C', yellow:'#F4D62D', navy:'#003646', blueDeep:'#005265', steel:'#2D789F', cyan:'#1BA2C8', teal:'#1DA0A9', paper:'#F7FAFC', line:'#D7E1E8' };
+    const MAX_PARTICIPANTS = 10;
+    const DEFAULT_BOARD = {
+      budget: 6000000,
+      strategicThemes: [
+        { id: 'comercial',  name: 'Comercial',         allocation: 1500000, color: PALETTE.orange1 },
+        { id: 'transporte', name: 'Transporte',         allocation: 1500000, color: PALETTE.orange2 },
+        { id: 'cruzamento', name: 'Cruzamento de Vias', allocation: 1500000, color: PALETTE.steel },
+        { id: 'plataforma', name: 'Plataforma',         allocation: 1500000, color: PALETTE.teal }
+      ],
+      epics: [
+        { id: 'cs1', name: 'C Sol.1: Entrega comercial autônoma por meio de vans',    cost: 2000000, description: 'Solução de entrega comercial autônoma utilizando vans.',                                                                                                  themeId: 'comercial',  horizon: 'H2', isSolution: true,  status: 'available' },
+        { id: 'c1',  name: 'C1: Expandir para mais idiomas',                          cost:  100000, description: 'Expandir os serviços de entrega para outros idiomas.',                                                                                                   themeId: 'comercial',  horizon: 'H1', status: 'available' },
+        { id: 'c2',  name: 'C2: Gamificação das entregas',                            cost:  500000, description: 'Gamificar o processo de pedido para se titular pedidos.',                                                                                                themeId: 'comercial',  horizon: 'H1', status: 'available' },
+        { id: 'c3',  name: 'C3: Plataforma de entrega por drones',                    cost:  900000, description: 'Fornecer uma Capability para entrega de mantimentos por drones.',                                                                                        themeId: 'comercial',  horizon: 'H2', status: 'available' },
+        { id: 'c4',  name: 'C4: Suporte ao Apple Pay',                                cost:  100000, description: 'Oferecer suporte ao Apple Pay como método de pagamento para entrega.',                                                                                   themeId: 'comercial',  horizon: 'H1', status: 'available' },
+        { id: 'c5',  name: 'C5: Construir um serviço para a Alexa',                   cost:  200000, description: 'Permitir pedidos de voz por meio de dispositivos compatíveis com a Alexa.',                                                                              themeId: 'comercial',  horizon: 'H2', status: 'available' },
+        { id: 'c6',  name: 'C6: Entrega de produtos perecíveis de fazendas locais',   cost:  100000, description: 'Testar a capacidade de entregar mercadorias perecíveis dentro de um determinado intervalo de tempo e distância.',                                         themeId: 'comercial',  horizon: 'H2', status: 'available' },
+        { id: 'c7',  name: 'C7: Sistema de reconhecimento de imagem',                 cost:  700000, description: 'Melhorar os sistemas avançados de controle e reconhecimento de imagem para interpretar informações sensoriais e identificar caminhos de navegação com 90% de precisão.', themeId: 'comercial',  horizon: 'H3', status: 'available' },
+        { id: 'ts1', name: 'T Sol.1: Transporte público autônomo por meio de ônibus', cost: 1000000, description: 'Solução de transporte público autônomo com ônibus.',                                                                                                     themeId: 'transporte', horizon: 'H2', isSolution: true,  status: 'available' },
+        { id: 't1',  name: 'T1: Mover para o nível autônomo 5',                       cost:  600000, description: 'Possibilitar autonomia do Nível 5 que permitirá entregas para clientes governamentais em condições off-road, abrindo um enorme mercado para a empresa.',  themeId: 'transporte', horizon: 'H2', status: 'available' },
+        { id: 't2',  name: 'T2: Atualizar sensores',                                  cost:  500000, description: 'Atualizar os sensores do veículo para garantir um reconhecimento mais rápido das situações dinâmicas em uma estrada.',                                    themeId: 'transporte', horizon: 'H1', status: 'available' },
+        { id: 't3',  name: 'T3: Melhorar a navegação',                                cost:  300000, description: 'Melhorar as Capabilities de navegação para reduzir o tempo de percurso.',                                                                                themeId: 'transporte', horizon: 'H1', status: 'available' },
+        { id: 't4',  name: 'T4: Capability de detecção de beirada',                   cost:  800000, description: 'Melhorar o sistema de reconhecimento de imagem para permitir a detecção de beiradas em condições de baixa luminosidade e baixo contraste.',              themeId: 'transporte', horizon: 'H2', status: 'available' },
+        { id: 'p1',  name: 'P1: Parceria com a plataforma de entrega',                cost:  700000, description: 'Faça parceria com uma empresa que tenha uma plataforma de entrega. Obs: se financiado, não pode financiar P2 nem P3.',                                   themeId: 'cruzamento', horizon: 'H1', status: 'available' },
+        { id: 'p2',  name: 'P2: Desenvolvimento da plataforma de entrega',             cost:  800000, description: 'Construir uma plataforma de entrega interna. Obs: se financiado, não pode financiar P1.',                                                                themeId: 'cruzamento', horizon: 'H1', status: 'available' },
+        { id: 'p3',  name: 'P3: Integração da gestão de frotas da plataforma',        cost:  200000, description: 'Integrar a nova plataforma com o pacote de gerenciamento de frota. Obs: só pode ser financiado se P2 estiver financiado.',                               themeId: 'cruzamento', horizon: 'H2', status: 'available' },
+        { id: 'p4',  name: 'P4: Continuous Delivery Pipeline',                        cost:  300000, description: 'Permitir a Liberação Sob Demanda de novas Features.',                                                                                                    themeId: 'plataforma', horizon: 'H1', status: 'available' }
+      ],
+      activity: [{ id: 'seed-1', ts: Date.now(), text: 'Board inicializado com o kit visual do exercício.' }],
+      revision: 1,
+      updated_at: new Date().toISOString()
+    };
+
+    // Business rules: which funded epics block others, and which require another funded epic
+    const CONSTRAINTS = {
+      // if key is funded → values are blocked
+      blocks: { p1: ['p2', 'p3'], p2: ['p1'] },
+      // key can only be funded if value is already funded
+      requires: { p3: 'p2' },
+      // if key is unfunded → cascade-unfund values
+      cascade: { p2: ['p3'] }
+    };
+
+    function getBlockedIds(epics) {
+      const fundedIds = new Set(epics.filter(e => e.status === 'funded').map(e => e.id));
+      const blocked = new Set();
+      for (const [src, targets] of Object.entries(CONSTRAINTS.blocks)) {
+        if (fundedIds.has(src)) targets.forEach(t => blocked.add(t));
+      }
+      return blocked;
+    }
+
+    function constraintViolation(epicId, targetStatus, epics) {
+      if (targetStatus !== 'funded') return null;
+      const fundedIds = new Set(epics.filter(e => e.status === 'funded').map(e => e.id));
+      // Check if blocked by a currently funded epic
+      for (const [src, targets] of Object.entries(CONSTRAINTS.blocks)) {
+        if (fundedIds.has(src) && targets.includes(epicId)) {
+          const blocker = epics.find(e => e.id === src);
+          return `Conflito: "${blocker?.name || src}" já está financiado e bloqueia este épico.`;
+        }
+      }
+      // Check required dependency
+      const req = CONSTRAINTS.requires[epicId];
+      if (req && !fundedIds.has(req)) {
+        const dep = epics.find(e => e.id === req);
+        return `Dependência: financie primeiro "${dep?.name || req}".`;
+      }
+      return null;
+    }
+
+    let _toastTimer = null;
+    function showToast(msg) {
+      const existing = document.querySelector('.constraint-toast');
+      if (existing) existing.remove();
+      if (_toastTimer) clearTimeout(_toastTimer);
+      const toast = document.createElement('div');
+      toast.className = 'constraint-toast';
+      toast.textContent = '⚠ ' + msg;
+      document.body.appendChild(toast);
+      _toastTimer = setTimeout(() => toast.remove(), 3500);
+    }
+
+    const state = {
+      room: '', name: '', sessionId: uid('user'),
+      color: [PALETTE.orange1, PALETTE.orange2, PALETTE.steel, PALETTE.cyan, PALETTE.teal][Math.floor(Math.random() * 5)],
+      board: null, presence: [], connected: false, mode: 'Firebase Realtime',
+      boardUnsub: null, presenceUnsub: null
+    };
+
+    function uid(prefix) { return prefix + '-' + Math.random().toString(36).slice(2, 9); }
+    function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
+    function BRL(value) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(value || 0); }
+    function compactMoney(value) { return new Intl.NumberFormat('pt-BR', { notation: 'compact', maximumFractionDigits: 1 }).format(value || 0); }
+    function parseSearch() { const params = new URLSearchParams(window.location.search); return { room: params.get('room') || ('lpm-' + Math.random().toString(36).slice(2, 8)), name: params.get('name') || '' }; }
+    function setQuery(room, name) { const params = new URLSearchParams(window.location.search); params.set('room', room); if (name) params.set('name', name); else params.delete('name'); window.history.replaceState({}, '', window.location.pathname + '?' + params.toString()); }
+    function boardRevision(board) { return Number((board && board.revision) || 0); }
+    function normalizeBoardForSave(nextBoard) { const clone = deepClone(nextBoard); clone.revision = boardRevision(nextBoard) + 1; clone.updated_at = new Date().toISOString(); return clone; }
+    function themeById(id) { return state.board.strategicThemes.find(t => t.id === id); }
+    function cardThemeColor(epic) { return themeById(epic.themeId)?.color || PALETTE.cyan; }
+    function showError(message, boot = false) { document.getElementById('error-chip').classList.remove('hidden'); const target = document.getElementById(boot ? 'boot-error' : 'runtime-error'); target.textContent = message; target.classList.remove('hidden'); }
+    function clearError(boot = false) { if (boot) { document.getElementById('boot-error').classList.add('hidden'); document.getElementById('boot-error').textContent = ''; } else { document.getElementById('runtime-error').classList.add('hidden'); document.getElementById('runtime-error').textContent = ''; } document.getElementById('error-chip').classList.add('hidden'); }
+
+    function runSelfTests() {
+      const sample = normalizeBoardForSave(Object.assign(deepClone(DEFAULT_BOARD), { revision: 4 }));
+      if (sample.revision !== 5) throw new Error('Teste falhou: revision não incrementou corretamente.');
+      const invested = DEFAULT_BOARD.epics.filter(e => e.status === 'funded').reduce((sum, e) => sum + e.cost, 0);
+      if (invested !== 0) throw new Error('Teste falhou: cálculo de investimento inicial inválido.');
+      const theme = DEFAULT_BOARD.strategicThemes.find(t => t.id === 'comercial');
+      if (!theme || theme.color !== PALETTE.orange1) throw new Error('Teste falhou: tema comercial inválido.');
+    }
+
+    function initPalette() { const row = document.getElementById('palette-row'); [PALETTE.orange1, PALETTE.orange2, PALETTE.amber, PALETTE.yellow, PALETTE.navy, PALETTE.blueDeep, PALETTE.steel, PALETTE.cyan, PALETTE.teal].forEach(color => { const el = document.createElement('span'); el.className = 'palette-swatch'; el.style.backgroundColor = color; row.appendChild(el); }); }
+    function toggleScreens(entered) { document.getElementById('join-screen').classList.toggle('hidden', entered); document.getElementById('app-screen').classList.toggle('hidden', !entered); }
+
+    function initJoinForm(initial) {
+      document.getElementById('join-name').value = initial.name;
+      document.getElementById('join-room').value = initial.room;
+      document.getElementById('join-button').addEventListener('click', joinRoom);
+      document.getElementById('share-button').addEventListener('click', shareLink);
+      document.getElementById('consolidation-button').addEventListener('click', () => { window.open('lpm-consolidation.html', '_blank'); });
+      document.getElementById('reset-button').addEventListener('click', resetBoard);
+      document.getElementById('budget-input').addEventListener('change', (event) => updateBudget(event.target.value));
+      ['available-column', 'funded-column'].forEach(id => {
+        const column = document.getElementById(id);
+        column.addEventListener('dragover', (event) => event.preventDefault());
+        column.addEventListener('drop', (event) => { event.preventDefault(); const epicId = event.dataTransfer.getData('text/plain'); const targetStatus = column.dataset.status; if (epicId && targetStatus) moveEpic(epicId, targetStatus); });
+      });
+    }
+
+    async function ensureRoomExists() {
+      const boardRef = ref(db, `rooms/${state.room}/boardState`);
+      const snapshot = await get(boardRef);
+      if (!snapshot.exists()) {
+        await set(boardRef, DEFAULT_BOARD);
+      }
+    }
+
+    async function loadRoomBoard() {
+      const boardRef = ref(db, `rooms/${state.room}/boardState`);
+      const snapshot = await get(boardRef);
+      state.board = snapshot.val() || deepClone(DEFAULT_BOARD);
+    }
+
+    async function joinRoom() {
+      clearError(true);
+      const name = document.getElementById('join-name').value.trim();
+      const room = document.getElementById('join-room').value.trim().replace(/\s+/g, '-').toLowerCase();
+      if (!name) return;
+      state.name = name; state.room = room; setQuery(room, name);
+      try { await connectRoom(); toggleScreens(true); render(); } catch (error) { showError(error.message || 'Falha ao entrar na sala.', true); }
+    }
+
+    async function connectRoom() {
+      disconnectRoom();
+      state.connected = true;
+      state.mode = 'Firebase Realtime';
+
+      await ensureRoomExists();
+      await loadRoomBoard();
+
+      // Register presence with automatic cleanup on disconnect
+      const presenceRef = ref(db, `rooms/${state.room}/presence/${state.sessionId}`);
+      await set(presenceRef, {
+        sessionId: state.sessionId,
+        name: state.name || 'Participante',
+        color: state.color,
+        online_at: new Date().toISOString()
+      });
+      onDisconnect(presenceRef).remove();
+
+      // Subscribe to real-time board updates
+      const boardRef = ref(db, `rooms/${state.room}/boardState`);
+      state.boardUnsub = onValue(boardRef, (snapshot) => {
+        const board = snapshot.val();
+        if (board && boardRevision(board) >= boardRevision(state.board)) {
+          state.board = board;
+          render();
+        }
+      });
+
+      // Subscribe to real-time presence updates
+      const presenceAllRef = ref(db, `rooms/${state.room}/presence`);
+      state.presenceUnsub = onValue(presenceAllRef, (snapshot) => {
+        const data = snapshot.val() || {};
+        state.presence = Object.values(data).slice(0, MAX_PARTICIPANTS);
+        renderPresence();
+        document.getElementById('participants-stat').textContent = String(state.presence.length);
+        document.getElementById('limit-chip').classList.toggle('hidden', state.presence.length <= MAX_PARTICIPANTS);
+      });
+
+      clearError();
+    }
+
+    function disconnectRoom() {
+      if (state.boardUnsub) { state.boardUnsub(); state.boardUnsub = null; }
+      if (state.presenceUnsub) { state.presenceUnsub(); state.presenceUnsub = null; }
+      if (state.room && state.sessionId) {
+        set(ref(db, `rooms/${state.room}/presence/${state.sessionId}`), null).catch(() => {});
+      }
+      state.connected = false;
+    }
+
+    async function saveCurrentBoard(nextBoard) {
+      const normalized = normalizeBoardForSave(nextBoard);
+      await set(ref(db, `rooms/${state.room}/boardState`), normalized);
+      state.board = normalized;
+      render();
+    }
+
+    async function moveEpic(epicId, targetStatus) {
+      const epic = state.board.epics.find(e => e.id === epicId);
+      if (!epic || epic.status === targetStatus) return;
+      const violation = constraintViolation(epicId, targetStatus, state.board.epics);
+      if (violation) { showToast(violation); return; }
+      const next = deepClone(state.board);
+      next.epics = next.epics.map(e => e.id === epicId ? Object.assign({}, e, { status: targetStatus }) : e);
+      // Cascade unfunding: if an epic is removed and others depend on it, remove them too
+      if (targetStatus === 'available') {
+        const cascade = CONSTRAINTS.cascade[epicId] || [];
+        cascade.forEach(depId => {
+          next.epics = next.epics.map(e => e.id === depId ? Object.assign({}, e, { status: 'available' }) : e);
+        });
+      }
+      next.activity = [{ id: uid('act'), ts: Date.now(), text: (state.name || 'Participante') + ' ' + (targetStatus === 'funded' ? 'financiou' : 'removeu') + ' "' + epic.name + '".' }].concat(next.activity || []).slice(0, 50);
+      try { await saveCurrentBoard(next); } catch (error) { showError('Falha ao atualizar o board: ' + error.message); }
+    }
+
+    async function updateBudget(value) { const next = deepClone(state.board); next.budget = Number(value) || 0; try { await saveCurrentBoard(next); } catch (error) { showError('Falha ao atualizar orçamento: ' + error.message); } }
+    async function updateThemeAllocation(themeId, value) { const next = deepClone(state.board); next.strategicThemes = next.strategicThemes.map(theme => theme.id === themeId ? Object.assign({}, theme, { allocation: Number(value) || 0 }) : theme); try { await saveCurrentBoard(next); } catch (error) { showError('Falha ao atualizar alocação do tema: ' + error.message); } }
+    async function resetBoard() { const next = deepClone(DEFAULT_BOARD); next.activity = [{ id: uid('act'), ts: Date.now(), text: (state.name || 'Facilitador') + ' reiniciou o board.' }]; try { await saveCurrentBoard(next); } catch (error) { showError('Falha ao reiniciar o board: ' + error.message); } }
+    function shareLink() { const url = window.location.origin + window.location.pathname + '?room=' + encodeURIComponent(state.room); navigator.clipboard.writeText(url).then(() => alert('Link da sala copiado.')).catch(() => window.prompt('Copie o link da sala:', url)); }
+
+    function render() {
+      if (!state.board) return;
+      const invested = state.board.epics.filter(e => e.status === 'funded').reduce((sum, epic) => sum + epic.cost, 0);
+      const balance = state.board.budget - invested;
+      const available = state.board.epics.filter(e => e.status === 'available');
+      const funded = state.board.epics.filter(e => e.status === 'funded');
+      const allocationTotal = state.board.strategicThemes.reduce((sum, theme) => sum + (Number(theme.allocation) || 0), 0);
+      document.getElementById('room-title').textContent = 'Sala ' + state.room;
+      document.getElementById('mode-chip').textContent = state.mode;
+      document.getElementById('sync-chip').textContent = state.connected ? 'Sincronização ativa' : 'Sem conexão';
+      document.getElementById('budget-stat').textContent = BRL(state.board.budget);
+      document.getElementById('invested-stat').textContent = BRL(invested);
+      document.getElementById('participants-stat').textContent = String(state.presence.length);
+      document.getElementById('budget-input').value = state.board.budget;
+      const balanceCard = document.getElementById('balance-card'); const balanceStat = document.getElementById('balance-stat');
+      balanceCard.style.background = balance < 0 ? 'var(--dangerBg)' : '#F2FAFD'; balanceStat.style.color = balance < 0 ? 'var(--orange2)' : 'var(--blueDeep)'; balanceStat.textContent = BRL(balance);
+      document.getElementById('available-total').textContent = compactMoney(available.reduce((sum, epic) => sum + epic.cost, 0));
+      document.getElementById('funded-total').textContent = compactMoney(invested);
+      renderThemes(allocationTotal); renderEpics('available-list', available, 'funded'); renderEpics('funded-list', funded, 'available', true); renderPresence(); renderActivity(); updateGuardrails();
+    }
+
+    function pct(v) { return Math.round((v || 0) * 100) + '%'; }
+
+    function updateGuardrails() {
+      const funded = state.board.epics.filter(e => e.status === 'funded');
+      const totalFunded = funded.reduce((s, e) => s + e.cost, 0);
+      const budget = state.board.budget;
+
+      // Guardrail 1: Horizon % — H1 >= 40%, H3 <= 20%
+      const byHz = { H1: 0, H2: 0, H3: 0 };
+      funded.forEach(e => { const h = e.horizon || 'H1'; byHz[h] = (byHz[h] || 0) + e.cost; });
+      const pctH1 = totalFunded ? byHz.H1 / totalFunded : 0;
+      const pctH2 = totalFunded ? byHz.H2 / totalFunded : 0;
+      const pctH3 = totalFunded ? byHz.H3 / totalFunded : 0;
+      const hzOk = pctH1 >= 0.40 && pctH3 <= 0.20;
+      const hzStatus = totalFunded === 0 ? '—' : hzOk ? '✓ OK' : '⚠ Revisar';
+      const hzClass = totalFunded === 0 ? 'gstatus-ok' : hzOk ? 'gstatus-ok' : 'gstatus-fail';
+
+      // Guardrail 2: Theme capacity — no theme > 50% of funded portfolio
+      const byTheme = {};
+      funded.forEach(e => { byTheme[e.themeId] = (byTheme[e.themeId] || 0) + e.cost; });
+      const maxTheme = totalFunded ? Math.max(...(Object.values(byTheme).length ? Object.values(byTheme) : [0])) / totalFunded : 0;
+      const capOk = maxTheme <= 0.50;
+      const capStatus = totalFunded === 0 ? '—' : capOk ? '✓ OK' : '⚠ Atenção';
+      const capClass = totalFunded === 0 ? 'gstatus-ok' : capOk ? 'gstatus-ok' : 'gstatus-warn';
+      const maxThemeName = Object.entries(byTheme).sort((a, b) => b[1] - a[1])[0];
+
+      // Guardrail 3: Epic threshold — total funded <= budget
+      const threshOk = totalFunded <= budget;
+      const near = totalFunded > budget * 0.90 && totalFunded <= budget;
+      const threshStatus = totalFunded === 0 ? '—' : !threshOk ? '✗ Excedido' : near ? '⚠ Próximo' : '✓ OK';
+      const threshClass = totalFunded === 0 ? 'gstatus-ok' : !threshOk ? 'gstatus-fail' : near ? 'gstatus-warn' : 'gstatus-ok';
+
+      const rows = document.getElementById('guardrail-rows');
+      if (!rows) return;
+      rows.innerHTML = `
+        <div class="guardrail-row">
+          <div>
+            <div class="guardrail-label">Horizontes</div>
+            <div class="guardrail-val">H1 ${pct(pctH1)} · H2 ${pct(pctH2)} · H3 ${pct(pctH3)}</div>
+            <div class="guardrail-hint">Meta: H1 ≥ 40% · H3 ≤ 20%</div>
+          </div>
+          <span class="${hzClass}">${hzStatus}</span>
+        </div>
+        <div class="guardrail-row">
+          <div>
+            <div class="guardrail-label">Capacidade por Tema</div>
+            <div class="guardrail-val">Maior: ${pct(maxTheme)}${maxThemeName ? ' (' + maxThemeName[0] + ')' : ''}</div>
+            <div class="guardrail-hint">Meta: nenhum tema &gt; 50%</div>
+          </div>
+          <span class="${capClass}">${capStatus}</span>
+        </div>
+        <div class="guardrail-row">
+          <div>
+            <div class="guardrail-label">Threshold do Portfólio</div>
+            <div class="guardrail-val">${BRL(totalFunded)} / ${BRL(budget)}</div>
+            <div class="guardrail-hint">Meta: não exceder orçamento</div>
+          </div>
+          <span class="${threshClass}">${threshStatus}</span>
+        </div>`;
+    }
+
+    function renderThemes(allocationTotal) {
+      const container = document.getElementById('themes-container'); container.innerHTML = '';
+      state.board.strategicThemes.forEach(theme => {
+        const wrapper = document.createElement('div'); wrapper.className = 'theme-box'; wrapper.style.borderColor = theme.color + '33';
+        wrapper.innerHTML = `<div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px;"><span class="theme-pill" style="background:${theme.color};">${theme.name}</span><span style="font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#94a3b8;">Alocação inicial</span></div>`;
+        const input = document.createElement('input'); input.type = 'number'; input.value = theme.allocation; input.addEventListener('change', (event) => updateThemeAllocation(theme.id, event.target.value)); wrapper.appendChild(input); container.appendChild(wrapper);
+      });
+      const note = document.getElementById('allocation-note'); const ok = allocationTotal === state.board.budget; note.style.background = ok ? 'var(--okBg)' : 'var(--warnBg)'; note.style.color = ok ? '#047857' : 'var(--orange2)'; note.textContent = 'Alocação por temas: ' + BRL(allocationTotal) + ' ' + (ok ? '• ok' : '• ajuste recomendado');
+    }
+
+    function renderEpics(listId, epics, targetStatus, emptyForFunded) {
+      const list = document.getElementById(listId); list.innerHTML = '';
+      if (!epics.length && emptyForFunded) { const empty = document.createElement('div'); empty.className = 'empty-state'; empty.innerHTML = '<div><div class="empty-title">Arraste os épicos para montar o portfólio financiado</div><div class="empty-text">Objetivo: fechar um conjunto coerente sem exceder o limite.</div></div>'; list.appendChild(empty); return; }
+      const blockedIds = getBlockedIds(state.board.epics);
+      epics.forEach(epic => {
+        const theme = themeById(epic.themeId);
+        const violation = constraintViolation(epic.id, targetStatus, state.board.epics);
+        const isBlocked = !!violation;
+        const card = document.createElement('div');
+        card.className = 'epic-card' + (isBlocked ? ' blocked' : '');
+        card.draggable = !isBlocked;
+        card.addEventListener('dragstart', (event) => { if (isBlocked) { event.preventDefault(); return; } event.dataTransfer.setData('text/plain', epic.id); card.classList.add('dragging'); });
+        card.addEventListener('dragend', () => card.classList.remove('dragging'));
+        const blockBadge = isBlocked ? `<div class="block-badge">&#128274; ${violation}</div>` : '';
+        if (epic.isSolution) card.classList.add('solution');
+        const hzBadge = epic.horizon ? `<span class="horizon-badge hz-${epic.horizon}">${epic.horizon}</span>` : '';
+        const solBadge = epic.isSolution ? `<div class="sol-badge">&#11088; Solução</div>` : '';
+        card.innerHTML = `<div class="epic-top"><div><div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:4px;"><span class="theme-pill" style="background:${theme ? theme.color : PALETTE.cyan};">${theme ? theme.name : 'Theme'}</span>${hzBadge}</div><div class="epic-name">${epic.name}</div>${solBadge}<div class="epic-desc" style="margin-top:6px;">${epic.description}</div>${blockBadge}</div><div class="epic-cost" style="background:${cardThemeColor(epic)};">${compactMoney(epic.cost)}</div></div><div class="epic-actions"><span class="epic-hint">Arrastar ou usar ação rápida</span></div>`;
+        const button = document.createElement('button'); button.className = 'btn'; button.style.padding = '10px 14px'; button.style.borderRadius = '16px'; button.style.color = '#fff'; button.style.background = epic.status === 'available' ? 'var(--orange1)' : 'var(--blueDeep)'; button.textContent = epic.status === 'available' ? 'Financiar' : 'Remover'; button.disabled = isBlocked; button.style.opacity = isBlocked ? '0.4' : '1'; button.addEventListener('click', () => moveEpic(epic.id, targetStatus)); card.querySelector('.epic-actions').appendChild(button); list.appendChild(card);
+      });
+    }
+
+    function renderPresence() { const list = document.getElementById('presence-list'); list.innerHTML = ''; state.presence.forEach(person => { const item = document.createElement('div'); item.className = 'presence-item'; item.innerHTML = `<span class="presence-dot" style="background:${person.color || PALETTE.cyan};"></span><span class="presence-name">${person.name}</span>`; list.appendChild(item); }); }
+    function renderActivity() { if (!state.board) return; const list = document.getElementById('activity-list'); list.innerHTML = ''; (state.board.activity || []).slice().sort((a, b) => b.ts - a.ts).slice(0, 8).forEach(item => { const el = document.createElement('div'); el.className = 'activity-item'; el.textContent = item.text; list.appendChild(el); }); }
+
+    async function boot() {
+      try {
+        runSelfTests(); initPalette(); const initial = parseSearch(); initJoinForm(initial);
+        if (!validateFirebaseConfig(FIREBASE_CONFIG)) {
+          const btn = document.getElementById('join-button')
+          if (btn) btn.disabled = true
+          throw new Error('⚠️ Firebase não configurado. Abra o arquivo firebase-config.js e substitua os valores SUA_API_KEY, SEU-PROJETO etc. pelas credenciais reais do seu projeto Firebase. Consulte o README.md para o passo a passo.')
+        }
+        clearError(true);
+        if (initial.name) { state.name = initial.name; state.room = initial.room; await connectRoom(); toggleScreens(true); render(); }
+      } catch (error) { showError(error.message || 'Falha ao inicializar o app.', true); }
+    }
+
+    boot();
+  </script>
+</body>
+</html>
