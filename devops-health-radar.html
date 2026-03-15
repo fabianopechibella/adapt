@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevOps Health Radar Assessment</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11px;
+      color: #1a1a1a;
+      background: #fff;
+    }
+
+    /* ── PAGE WRAPPER ── */
+    .page {
+      width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid #1b3a6b;
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+    }
+    .header-logo { font-size: 22px; font-weight: 900; color: #1b3a6b; letter-spacing: -0.5px; }
+    .header-logo span { color: #f48120; }
+    .header-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1b3a6b;
+      text-align: right;
+    }
+
+    /* ── TOP AREA: instructions + radar ── */
+    .top-area {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* ── INSTRUCTIONS ── */
+    .instructions {
+      flex: 1;
+      font-size: 10px;
+      line-height: 1.5;
+      color: #222;
+    }
+    .instructions h3 {
+      font-size: 11px;
+      color: #1b3a6b;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .instructions p { margin-bottom: 6px; }
+    .maturity-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 8px;
+      font-size: 10px;
+    }
+    .maturity-table th {
+      background: #1b3a6b;
+      color: #fff;
+      padding: 3px 6px;
+      text-align: left;
+      font-weight: 600;
+    }
+    .maturity-table td {
+      border: 1px solid #ccc;
+      padding: 3px 6px;
+      vertical-align: top;
+    }
+    .maturity-table tr:nth-child(even) td { background: #f5f7fa; }
+
+    /* ── RADAR CHART ── */
+    .radar-wrap {
+      width: 340px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .radar-wrap canvas { max-width: 320px; max-height: 320px; }
+
+    /* ── FORM META FIELDS ── */
+    .meta-fields {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 16px;
+      align-items: center;
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+      background: #f9f9f9;
+    }
+    .meta-fields label {
+      font-weight: 700;
+      font-size: 11px;
+      color: #1b3a6b;
+      white-space: nowrap;
+    }
+    .meta-fields input[type="text"],
+    .meta-fields input[type="date"] {
+      border: none;
+      border-bottom: 1.5px solid #1b3a6b;
+      background: transparent;
+      font-size: 12px;
+      padding: 2px 4px;
+      outline: none;
+      min-width: 260px;
+      color: #1a1a1a;
+    }
+
+    /* ── MAIN ASSESSMENT TABLE ── */
+    .assessment-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10px;
+      table-layout: fixed;
+    }
+
+    /* Column widths */
+    .col-aspecto    { width: 90px;  }
+    .col-atividade  { width: 130px; }
+    .col-complement { width: 130px; }
+    .col-criterios  { width: 470px; }
+    .col-pontuacao  { width: 70px;  }
+    .col-comments   { width: 120px; }
+
+    .assessment-table thead th {
+      background: #1b3a6b;
+      color: #fff;
+      padding: 5px 6px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid #0e2650;
+    }
+
+    /* Section header rows (CI / CD / RoD) */
+    .section-header td {
+      background: #2e6da4;
+      color: #fff;
+      font-weight: 700;
+      font-size: 11px;
+      padding: 4px 8px;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    /* Aspecto cell (merged rows, vertical text) */
+    .aspecto-cell {
+      background: #dce8f5;
+      font-weight: 700;
+      color: #1b3a6b;
+      text-align: center;
+      vertical-align: middle;
+      padding: 4px;
+      border: 1px solid #b0c8e0;
+      font-size: 10px;
+      line-height: 1.3;
+    }
+
+    .assessment-table td {
+      border: 1px solid #c8d8ea;
+      padding: 4px 6px;
+      vertical-align: top;
+    }
+
+    .assessment-table tr:nth-child(even) td:not(.aspecto-cell) {
+      background: #f5f8fc;
+    }
+    .assessment-table tr:nth-child(odd) td:not(.aspecto-cell) {
+      background: #ffffff;
+    }
+
+    /* Activity / Complement cells */
+    .atividade-cell .title {
+      font-weight: 700;
+      color: #1b3a6b;
+      font-size: 10px;
+      margin-bottom: 2px;
+    }
+    .atividade-cell .subtitle {
+      font-size: 9px;
+      color: #444;
+      font-style: italic;
+      line-height: 1.4;
+    }
+    .complement-cell {
+      font-size: 10px;
+      color: #222;
+      line-height: 1.4;
+    }
+
+    /* Criteria cell */
+    .criterios-cell { font-size: 9.5px; line-height: 1.45; color: #222; }
+    .criterios-cell .nivel-label {
+      font-weight: 700;
+      color: #1b3a6b;
+    }
+    .criterios-cell p { margin-bottom: 3px; }
+
+    /* Score cell */
+    .pontuacao-cell {
+      text-align: center;
+      vertical-align: middle;
+    }
+    .score-input {
+      width: 52px;
+      height: 32px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #1b3a6b;
+      border: 1.5px solid #2e6da4;
+      border-radius: 4px;
+      background: #eef4fb;
+      outline: none;
+    }
+    .score-input:focus {
+      border-color: #f48120;
+      background: #fff8f0;
+    }
+
+    /* Comment cell */
+    .comments-textarea {
+      width: 100%;
+      min-height: 60px;
+      font-size: 10px;
+      border: 1px solid #ccc;
+      padding: 4px;
+      resize: vertical;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #333;
+    }
+
+    /* ── FOOTER / PRINT ── */
+    .footer {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+    .btn {
+      padding: 8px 24px;
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+    }
+    .btn-print  { background: #1b3a6b; color: #fff; }
+    .btn-reset  { background: #e8e8e8; color: #333; }
+
+    /* ── SCORE BADGE (auto-computed) ── */
+    .score-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .score-1 { background: #ffd5d5; color: #a00; }
+    .score-2 { background: #ffe8c8; color: #854d00; }
+    .score-3 { background: #fff3c8; color: #7a5c00; }
+    .score-4 { background: #d4f0d4; color: #1a6b1a; }
+    .score-5 { background: #b8e0ff; color: #004a99; }
+
+    @media print {
+      body { font-size: 9px; }
+      .page { width: 100%; padding: 10px; }
+      .btn, .footer { display: none; }
+      .score-input { border: 1px solid #999; background: transparent; }
+      .comments-textarea { border: 1px solid #999; }
+      .radar-wrap canvas { max-width: 260px; max-height: 260px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── HEADER ── -->
+  <div class="header">
+    <div class="header-logo">adapt<span>works</span></div>
+    <div class="header-title">DevOps Health Radar Assessment</div>
+  </div>
+
+  <!-- ── TOP AREA ── -->
+  <div class="top-area">
+
+    <!-- INSTRUCTIONS -->
+    <div class="instructions">
+      <h3>Instruções</h3>
+      <p>Analise cada atividade com base na maturidade descrita e selecione a pontuação correspondente.</p>
+      <p>Consulte os critérios abaixo para identificar, avaliar e selecionar o nível de maturidade mais adequado à realidade atual da sua equipe em cada atividade — sendo <strong>1 = Inicial</strong> e <strong>5 = Excelência em Engenharia</strong>.</p>
+
+      <h3 style="margin-top:8px;">Critérios de Maturidade</h3>
+      <table class="maturity-table">
+        <thead>
+          <tr>
+            <th>Nível</th>
+            <th>Nome</th>
+            <th>Descrição</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1</strong></td>
+            <td>Inicial</td>
+            <td>Processos ad hoc, sem padronização. Execução manual e dependente de indivíduos.</td>
+          </tr>
+          <tr>
+            <td><strong>2</strong></td>
+            <td>Fundação Técnica</td>
+            <td>Práticas básicas estabelecidas. Automação parcial com alguma consistência.</td>
+          </tr>
+          <tr>
+            <td><strong>3</strong></td>
+            <td>Abordagem Consistente</td>
+            <td>Processos documentados e seguidos pela maioria. Métricas básicas coletadas.</td>
+          </tr>
+          <tr>
+            <td><strong>4</strong></td>
+            <td>Alta Eficiência Operacional</td>
+            <td>Automação abrangente, feedback rápido e melhoria contínua ativa.</td>
+          </tr>
+          <tr>
+            <td><strong>5</strong></td>
+            <td>Excelência em Engenharia</td>
+            <td>Práticas otimizadas, experimentação contínua e referência organizacional.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Processo de Pontuação</h3>
+      <p>Em caso de dúvida, avalie o nível mais baixo que se aplica. Marque a pontuação que melhor reflete a situação <em>atual</em>, não a desejada.</p>
+      <p>Cada coluna está organizada em quatro áreas-chave:</p>
+      <ul style="margin-left:14px; margin-top:4px; font-size:10px; line-height:1.6;">
+        <li><strong>Continuous Integration</strong></li>
+        <li><strong>Continuous Deployment</strong></li>
+        <li><strong>Release on Demand</strong></li>
+      </ul>
+    </div>
+
+    <!-- RADAR CHART -->
+    <div class="radar-wrap">
+      <canvas id="radarChart"></canvas>
+      <p style="font-size:9px;color:#666;margin-top:6px;text-align:center;">Gráfico atualizado automaticamente conforme as pontuações</p>
+    </div>
+  </div>
+
+  <!-- ── META FIELDS ── -->
+  <div class="meta-fields">
+    <label>Agile Release Train Name:</label>
+    <input type="text" id="artName" placeholder="Digite o nome do ART" />
+    <label style="margin-left:20px;">Data:</label>
+    <input type="date" id="assessmentDate" />
+  </div>
+
+  <!-- ── ASSESSMENT TABLE ── -->
+  <table class="assessment-table" id="assessmentTable">
+    <thead>
+      <tr>
+        <th class="col-aspecto">Aspecto</th>
+        <th class="col-atividade">Atividade</th>
+        <th class="col-complement">Complemento</th>
+        <th class="col-criterios">Critérios</th>
+        <th class="col-pontuacao">Pontuação</th>
+        <th class="col-comments">Comentários</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- ════════════════════════════════════════════
+           CONTINUOUS INTEGRATION
+           ════════════════════════════════════════════ -->
+      <tr class="section-header">
+        <td colspan="6">Continuous Integration</td>
+      </tr>
+
+      <!-- CI-1: Develop -->
+      <tr>
+        <td class="aspecto-cell" rowspan="5">
+          Continuous<br>Integration<br><br>
+          <em style="font-size:9px;font-weight:400;">(Utiliza e melhora<br>aceleração, preparação<br>e implementação)</em>
+        </td>
+        <td class="atividade-cell">
+          <div class="title">Develop</div>
+          <div class="subtitle">Transformar funcionalidades em produtos de software rapidamente</div>
+        </td>
+        <td class="complement-cell">
+          Avaliar a capacidade da equipe de definir e implementar Pipelines de forma rápida e confiável, adotando as melhores práticas e integrando os padrões de qualidade ao longo das etapas do processo.
+        </td>
+        <td class="criterios-cell">
+          <p><span class="nivel-label">1 – Inicial:</span> O time não utiliza um pipeline estruturado; deploys são manuais. Não há controle de versão ou ramificação padronizado. Membros dependem de configurações locais.</p>
+          <p><span class="nivel-label">2 – Fundação Técnica:</span> Repositório de código compartilhado existe. Pipelines básicos de CI foram criados, com build e alguns testes automatizados. Ramificação (branching) parcialmente padronizada.</p>
+          <p><span class="nivel-label">3 – Abordagem Consistente:</span> Pipelines de CI executados a cada commit. Revisões de código (code review) são práticas estabelecidas. Cobertura de testes é medida e acompanhada.</p>
+          <p><span class="nivel-label">4 – Alta Eficiência Operacional:</span> Feature flags e trunk-based development adotados. Lead time de commit para produção menor que 1 hora. Análise estática de código integrada ao pipeline.</p>
+          <p><span class="nivel-label">5 – Excelência em Engenharia:</span> Pipeline totalmente otimizado com feedback em minutos. Experimentação contínua e métricas avançadas de fluxo são usadas para melhoria. Referência interna de práticas.</p>
+        </td>
+        <td class="pontuacao-cell">
+          <input class="score-input" type="number" min="1" max="5" step="1" data-id="ci-develop" value="" placeholder="–" oninput="updateChart()">
+        </td>
+        <td><textarea class="comments-textarea" placeholder="Observações..."></textarea></td>
+      </tr>
+
+      <!-- CI-2: Build -->
+      <tr>
+        <td class="atividade-cell">
+          <div class="title">Build</div>
+          <div class="subtitle">Integrar continuamente com frequência e manter estabilidade técnica</div>
+        </td>
+        <td class="complement-cell">
+          Avaliar a capacidade da equipe de manter o sistema continuamente integrado e em condições estáveis de produção, garantindo a execução de testes unitários e outras validações a cada integração de código para prevenção de problemas.
+        </td>
+        <td class="criterios-cell">
+          <p><span class="nivel-label">1 – Inicial:</span> Integrações ocorrem raramente, causando conflitos frequentes. Build é executado manualmente por um único responsável. Falhas de build não são tratadas com prioridade.</p>
+          <p><span class="nivel-label">2 – Fundação Técnica:</span> Compilações automatizadas por pelo menos um pipeline. Testes básicos (unitários) são executados. Taxas de sucesso de build são monitoradas informalmente.</p>
+          <p><span class="nivel-label">3 – Abordagem Consistente:</span> Todos os commits disparam build automático. Política de "build verde primeiro" amplamente adotada. Testes unitários e de integração cobrindo módulos principais.</p>
+          <p><span class="nivel-label">4 – Alta Eficiência Operacional:</span> Build em menos de 10 minutos. Feedback imediato ao desenvolvedor em caso de falha. Cobertura de testes acima de 80%. Artefatos versionados e imutáveis.</p>
+          <p><span class="nivel-label">5 – Excelência em Engenharia:</span> Build otimizado com paralelização e caching. Zero tolerância a builds quebrados. Pipelines de múltiplos estágios com validação completa. Melhoria contínua dos tempos de build.</p>
+        </td>
+        <td class="pontuacao-cell">
+          <input class="score-input" type="number" min="1" max="5" step="1" data-id="ci-build" value="" placeholder="–" oninput="updateChart()">
+        </td>
+        <td><textarea class="comments-textarea" placeholder="Observações..."></textarea></td>
+      </tr>
+
+      <!-- CI-3: Test End-to-End -->
+      <tr>
+        <td class="atividade-cell">
+          <div class="title">Test End-to-End</div>
+          <div class="subtitle">Validar funcionalidades em ambientes semelhantes à produção</div>
+        </td>
+        <td class="complement-cell">
+          Ajudar a eficiência da sua equipe em testar condições, de ponta a ponta em ambientes semelhantes aos de produção. Inclui testes funcionais, testes de integração, testes de aceitação e de regressão — e o tempo de recuperação quando falhas ocorrem.
+        </td>
+        <td class="criterios-cell">
+          <p><span class="nivel-label">1 – Inicial:</span> Testes E2E manuais, esporádicos e sem cobertura sistematizada. Ambientes de teste divergem significativamente de produção. Bugs são encontrados principalmente em produção.</p>
+          <p><span class="nivel-label">2 – Fundação Técnica:</span> Ambiente de homologação disponível. Testes E2E parcialmente automatizados para fluxos críticos. Execução de testes antes de cada release.</p>
+          <p><span class="nivel-label">3 – Abordagem Consistente:</span> Ambientes paritários (parity) com produção. Suíte de testes E2E automatizada cobrindo cenários principais. Resultado dos testes é gate para promoção entre ambientes.</p>
+          <p><span class="nivel-label">4 – Alta Eficiência Operacional:</span> Testes E2E integrados ao pipeline de CI/CD. Execução paralela reduz tempo total. Dados de teste sintéticos gerenciados. Testes de contrato (contract testing) em uso.</p>
+          <p><span class="nivel-label">5 – Excelência em Engenharia:</span> Pirâmide de testes otimizada com E2E focados em fluxos críticos. Shift-left testing consolidado. Ambiente efêmero por PR. Qualidade como responsabilidade de toda a equipe.</p>
+        </td>
+        <td class="pontuacao-cell">
+          <input class="score-input" type="number" min="1" max="5" step="1" data-id="ci-test" value="" placeholder="–" oninput="updateChart()">
+        </td>
+        <td><textarea class="comments-textarea" placeholder="Observações..."></textarea></td>
+      </tr>
+
+      <!-- CI-4: Stage -->
+      <tr>
+        <td class="atividade-cell">
+          <div class="title">Stage</div>
+          <div class="subtitle">Disponibilizar versão funcional anterior à produção</div>
+        </td>
+        <td class="complement-cell">
+          O Stage (pré-produção) é o ambiente mais próximo do real, a fim que os candidatos a Engenharia / Homologação e conformidades de produção para avaliação antes da implementação em produção.
+        </td>
+        <td class="criterios-cell">
+          <p><span class="nivel-label">1 – Inicial:</span> Não há ambiente de staging. Validações finais ocorrem diretamente em produção ou em ambiente muito diferente do real.</p>
+          <p><span class="nivel-label">2 – Fundação Técnica:</span> Ambiente de staging existe, mas com configurações divergentes de produção. Promoção de artefatos feita manualmente com etapas não documentadas.</p>
+          <p><span class="nivel-label">3 – Abordagem Consistente:</span> Staging é paridade com produção para componentes principais. Processo de promoção documentado e seguido. Testes de aceitação executados sistematicamente neste ambiente.</p>
+          <p><span class="nivel-label">4 – Alta Eficiência Operacional:</span> Ambiente provisionado via IaC, idêntico à produção. Promoção automática via pipeline após aprovação dos testes. Dados de staging anonimizados a partir de produção.</p>
+          <p><span class="nivel-label">5 – Excelência em Engenharia:</span> Staging totalmente automatizado com validações de segurança, performance e compliance. Blue/green ou canary releases testados em staging antes de produção.</p>
+        </td>
+        <td class="pontuacao-cell">
+          <input class="score-input" type="number" min="1" max="5" step="1" data-id="ci-stage" value="" placeholder="–" oninput="updateChart()">
+        </td>
+        <td><textarea class="comments-textarea" placeholder="Observações..."></textarea></td>
+      </tr>
+
+      <!-- CI-5: Confiabilidade da Integração -->
+      <tr>
+        <td class="atividade-cell">
+          <div class="title">Confiabilidade da Integração</div>
+          <div class="subtitle">Continuação e integração de ciclos de melhoria no fluxo</div>
+        </td>
+        <td class="complement-cell">
+          Validar, monitorar e identificar anomalias de métricas no fluxo contínuo de integração, garantindo visibilidade sobre o estado real do pipeline e a saúde técnica do produto.
+        </td>
+        <td class="criterios-cell">
+          <p><span class="nivel-label">1 – Inicial:</span> Sem métricas de confiabilidade do pipeline. Falhas de integração são descobertas tardiamente. Não há rastreabilidade entre commits e deploys.</p>
+          <p><span class="nivel-label">2 – Fundação Técnica:</span> Taxa de sucesso de build e tempo de ciclo começam a ser coletados. Alertas básicos de falha existem. Revisões informais de pipeline ocorrem ocasionalmente.</p>
+          <p><span class="nivel-label">3 – Abordagem Consistente:</span> DORA metrics básicas (deployment frequency, lead time) são medidas. Dashboard de CI disponível para a equipe. Retrospectivas incluem revisão de métricas de pipeline.</p>
+          <p><span class="nivel-label">4 – Alta Eficiência Operacional:</span> Todas as DORA metrics rastreadas. SLOs para o pipeline definidos e monitorados. Análise de causa raiz estruturada para falhas recorrentes. Trend analysis ativo.</p>
+          <p><span class="nivel-label">5 – Excelência em Engenharia:</span> Métricas preditivas e alertas proativos. Melhoria contínua do pipeline orientada por dados. Benchmarking interno e externo das métricas de fluxo.</p>
+        </td>
+        <td class="pontuacao-cell">
+          <input class="score-input" type="number" min="1" max="5" step="1" data-id="ci-reliability" value="" placeholder="–" oninput="updateChart()">
+        </td>
+        <td><textarea class="comments-textarea" placeholder="Observações..."></textarea></td>
+      </tr>
+
+
+      <!-- ════════════════════════════════════════════
+           CONTINUOUS DEPLOYMENT
+           ════════════════════════════════════════════ -->
+      <tr class="section-header">
+        <td colspan="6">Continuous Deployment</td>
+      </tr>
+
+      <!-- CD-1: Deploy -->
+      <tr>
+        <td class="aspecto-cell" rowspan="5">
+          Continuous<br>Deployment<br><br>
+          <em style="font-size:9px;font-weight:400;">(Implementar<br>implantação segura<br>e frequente)</em>
+        </td>
+        <td class="atividade-cell">
+          <div class="title">Deploy</div>
+          <div class="subtitle">Implantar em produção com segurança e frequência</div>
+        </td>
+        <td class="complement-cell">
+          A implantação contínua deve ser realizada de forma confiável e frequente. Avaliar a capacidade de entregar valor ao usuário final com velocidade, segurança e rastreabilidade completa de cada deploy realizado.
+        </td>
+        <td class="criterios-cell">
+          <p><span class="nivel-label">1 – Inicial:</span> Deploys manuais, raros e de alto risco. Janelas de manutenção longas necessárias. Rollback manual e sem procedimento documentado. Equipe teme o processo de deploy.</p>
+          <p><span class="nivel-label">2 – Fundação Técnica:</span> Scripts de deploy básicos existem. Deploys ocorrem mensalmente ou por sprint. Checklist de deploy documentado. Rollback possível, mas manual e demorado.</p>
+          <p><span class="nivel-label">3 – Abordagem Consistente:</span> Pipeline de deploy automatizado para produção. Deploys semanais ou mais frequentes. Aprovações formais integradas ao pipeline. Rollback automatizado disponível.</p>
+          <p><span class="nivel-label">4 – Alta Eficiência Operacional:</span> Deploy sob demanda com aprovação one-click ou totalmente automatizado. Múltiplos deploys por semana. Blue/green ou canary deployments em uso. MTTR baixo.</p>
+          <p><span class="nivel-label">5 – Excelência em Engenharia:</span> Deploy contínuo (CD) com validação automática pós-deploy. Múltiplos deploys por dia. Zero-downtime garantido. Experimentação em produção com feature flags avançados.</p>
+        </td>
+        <td class="pontuacao-cell">
+          <input class="score-input" type="number" min="1" max="5" step="1" data-id="cd-deploy" value="" placeholder="–" oninput="updateChart()">
+        </td>
+        <td><textarea class="comments-textarea" placeholder="Observações..."></textarea></td>
+      </tr>
+
+      <!-- CD-2: Verify -->
+      <tr>
+        <td class="atividade-cell">
+          <div class="title">Verify</div>
+          <div class="subtitle">Confirmar que o ambiente em produção corresponde ao planejado</div>
+        </td>
+        <td class="complement-cell">
+          Confirmar que o ambiente após o deploy está funcionando conforme o esperado, com todas as configurações, integrações e dependências corretas, e que os critérios de aceitação técnicos foram atendidos.
+        </td>
+        <td class="criterios-cell">
+          <p><span class="nivel-label">1 – Inicial:</span> Verificação pós-deploy manual e inconsistente. Problemas descobertos pelos usuários. Sem testes de fumaça (smoke tests) estruturados. Alta taxa de rollback emergencial.</p>
+          <p><span class="nivel-label">2 – Fundação Técnica:</span> Smoke tests manuais executados após deploy. Checklist de verificação documentado. Monitoramento básico de disponibilidade ativo.</p>
+          <p><span class="nivel-label">3 – Abordagem Consistente:</span> Smoke tests automatizados pós-deploy. Healthchecks de endpoints críticos monitorados. Alertas configurados para anomalias imediatamente após deploy.</p>
+          <p><span class="nivel-label">4 – Alta Eficiência Operacional:</span> Suite completa de testes de verificação automática pós-deploy. Comparação automática de métricas pré e pós deploy. Gate automático de rollback se métricas degradam.</p>
+          <p><span class="nivel-label">5 – Excelência em Engenharia:</span> Verificação inteligente com análise de anomalias baseada em ML. Progressive delivery com validação contínua. Confiança total na automação de verificação.</p>
+        </td>
+        <td class="pontuacao-cell">
+          <input class="score-input" type="number" min="1" max="5" step="1" data-id="cd-verify" value="" placeholder="–" oninput="updateChart()">
+        </td>
+        <td><textarea class="comments-textarea" placeholder="Observações..."></textarea></td>
+      </tr>
+
+      <!-- CD-3: Monitor -->
+      <tr>
+        <td class="atividade-cell">
+          <div class="title">Monitor</div>
+          <div class="subtitle">Antecipar e corrigir problemas em produção continuamente</div>
+        </td>
+        <td class="complement-cell">
+          Antecipar os comportamentos inadequados nos lotes e transações completas de seu produto, tratando as não conformidades de forma eficaz. Manter a visibilidade da saúde do sistema e identificar degradações antes que impactem os usuários.
+        </td>
+        <td class="criterios-cell">
+          <p><span class="nivel-label">1 – Inicial:</span> Monitoramento ausente ou limitado a checks de disponibilidade. Incidentes descobertos por usuários. Sem logs estruturados ou centralizados. Alertas manuais ou inexistentes.</p>
+          <p><span class="nivel-label">2 – Fundação Técnica:</span> Monitoramento básico de infraestrutura (CPU, memória, disco). Logs centralizados para os principais serviços. Alertas para disponibilidade configurados. On-call informal definido.</p>
+          <p><span class="nivel-label">3 – Abordagem Consistente:</span> Métricas de aplicação (latência, taxa de erros, throughput) monitoradas. Dashboards por serviço disponíveis. Alertas baseados em SLOs. On-call formal com runbooks.</p>
+          <p><span class="nivel-label">4 – Alta Eficiência Operacional:</span> Observabilidade completa (métricas, logs, traces correlacionados). SLOs e SLAs definidos e monitorados. MTTR menor que 30 minutos. Detecção proativa de anomalias.</p>
+          <p><span class="nivel-label">5 – Excelência em Engenharia:</span> AIOps e detecção preditiva de falhas. Correlação automática de incidentes. Error budgets gerenciados ativamente. Cultura de SRE estabelecida com revisões de confiabilidade periódicas.</p>
+        </td>
+        <td class="pontuacao-cell">
+          <input class="score-input" type="number" min="1" max="5" step="1" data-id="cd-monitor" value="" placeholder="–" oninput="updateChart()">
+        </td>
+        <td><textarea class="comments-textarea" placeholder="Observações..."></textarea></td>
+      </tr>
+
+      <!-- CD-4: Respond -->
+      <tr>
+        <td class="atividade-cell">
+          <div class="title">Respond</div>
+          <div class="subtitle">Responder a incidentes e problemas de segurança</div>
+        </td>
+        <td class="complement-cell">
+          Responder a incidentes, situações críticas e problemas de segurança de forma estruturada, minimizando o impacto ao usuário e garantindo aprendizado organizacional a cada ocorrência.
+        </td>
+        <td class="criterios-cell">
+          <p><span class="nivel-label">1 – Inicial:</span> Resposta a incidentes reativa e desorganizada. Sem processo formal de gestão de incidentes. Comunicação inconsistente durante crises. Pós-mortem inexistente.</p>
+          <p><span class="nivel-label">2 – Fundação Técnica:</span> Processo básico de incident management documentado. Responsáveis por on-call definidos. Comunicação de status básica para stakeholders. Pós-mortem realizado para incidentes maiores.</p>
+          <p><span class="nivel-label">3 – Abordagem Consistente:</span> Severidade de incidentes categorizada (P1–P4). SLAs de resposta por severidade definidos. Status page pública ou interna ativa. Pós-mortem blameless para todos os P1/P2.</p>
+          <p><span class="nivel-label">4 – Alta Eficiência Operacional:</span> Runbooks automatizados para incidentes comuns. MTTR significativamente reduzido. Análise de causa raiz integrada ao backlog de melhoria. Simulações de incidentes (game days) regulares.</p>
+          <p><span class="nivel-label">5 – Excelência em Engenharia:</span> Auto-remediação para classes de incidentes conhecidos. Chaos engineering para validar resiliência. Cultura de aprendizado organizacional a partir de incidentes. Compartilhamento público de aprendizados.</p>
+        </td>
+        <td class="pontuacao-cell">
+          <input class="score-input" type="number" min="1" max="5" step="1" data-id="cd-respond" value="" placeholder="–" oninput="updateChart()">
+        </td>
+        <td><textarea class="comments-textarea" placeholder="Observações..."></textarea></td>
+      </tr>
+
+      <!-- CD-5: Observability -->
+      <tr>
+        <td class="atividade-cell">
+          <div class="title">Observability</div>
+          <div class="subtitle">Incorporar e medir utilidades e identificar observabilidade</div>
+        </td>
+        <td class="complement-cell">
+          Incorporar e medir as utilidades e identificar utilidades de observabilidade para garantir visibilidade completa do comportamento do sistema em produção, permitindo diagnóstico rápido de qualquer problema.
+        </td>
+        <td class="criterios-cell">
+          <p><span class="nivel-label">1 – Inicial:</span> Sem instrumentação de observabilidade. Diagnóstico de problemas depende de acesso direto ao servidor. Logs não estruturados e difíceis de pesquisar. Sem tracing distribuído.</p>
+          <p><span class="nivel-label">2 – Fundação Técnica:</span> Logs centralizados e pesquisáveis. Métricas básicas de sistema coletadas. Algum tracing manual implementado. Ferramentas de APM básicas em uso.</p>
+          <p><span class="nivel-label">3 – Abordagem Consistente:</span> Os três pilares (logs, métricas, traces) implementados. Correlação entre os pilares possível via trace ID. Dashboards de serviço padronizados. SLIs instrumentados no código.</p>
+          <p><span class="nivel-label">4 – Alta Eficiência Operacional:</span> Observabilidade como código (IaC para instrumentação). Tracing distribuído cobrindo toda a cadeia de chamadas. Profiling contínuo em produção. Alertas baseados em sintomas, não causas.</p>
+          <p><span class="nivel-label">5 – Excelência em Engenharia:</span> Observabilidade nativa ao desenvolvimento (shift-left observability). Real User Monitoring (RUM) integrado. Análise de negócio derivada de dados de observabilidade. Otimização contínua baseada em insights.</p>
+        </td>
+        <td class="pontuacao-cell">
+          <input class="score-input" type="number" min="1" max="5" step="1" data-id="cd-observability" value="" placeholder="–" oninput="updateChart()">
+        </td>
+        <td><textarea class="comments-textarea" placeholder="Observações..."></textarea></td>
+      </tr>
+
+
+      <!-- ════════════════════════════════════════════
+           RELEASE ON DEMAND
+           ════════════════════════════════════════════ -->
+      <tr class="section-header">
+        <td colspan="6">Release on Demand</td>
+      </tr>
+
+      <!-- RoD-1: Release -->
+      <tr>
+        <td class="aspecto-cell" rowspan="6">
+          Release<br>on Demand<br><br>
+          <em style="font-size:9px;font-weight:400;">(Disponibilizar<br>funcionalidades em<br>fluxo contínuo)</em>
+        </td>
+        <td class="atividade-cell">
+          <div class="title">Release</div>
+          <div class="subtitle">Disponibilizar funcionalidades em produção em fluxo contínuo</div>
+        </td>
+        <td class="complement-cell">
+          A gestão assegura que os produtos são disponibilizados para as partes interessadas de maneira controlada, rastreada e auditável, com capacidade de ativar ou desativar funcionalidades sob demanda.
+        </td>
+        <td class="criterios-cell">
+          <p><span class="nivel-label">1 – Inicial:</span> Releases ocorrem raramente, planejados com meses de antecedência. Big-bang deployments com alto risco. Sem capacidade de controlar ativação de features para subconjuntos de usuários.</p>
+          <p><span class="nivel-label">2 – Fundação Técnica:</span> Releases agendados por sprint ou mensalmente. Notas de release documentadas. Feature flags básicos utilizados para separar deploy de release. Processo de aprovação formal.</p>
+          <p><span class="nivel-label">3 – Abordagem Consistente:</span> Releases desacoplados de deploys via feature toggles. Capacidade de ativar para % de usuários. Processo de release automatizado e auditável. Rollback de feature instantâneo.</p>
+          <p><span class="nivel-label">4 – Alta Eficiência Operacional:</span> Release on demand real: qualquer funcionalidade pode ser ativada/desativada em produção sem deploy. Releases orientados por dados de uso e negócio. Gerenciamento de ciclo de vida de feature flags.</p>
+          <p><span class="nivel-label">5 – Excelência em Engenharia:</span> Releases personalizados por segmento de usuário, região ou perfil. Experimentação A/B integrada ao processo de release. Decisões de release orientadas por métricas de negócio em tempo real.</p>
+        </td>
+        <td class="pontuacao-cell">
+          <input class="score-input" type="number" min="1" max="5" step="1" data-id="rod-release" value="" placeholder="–" oninput="updateChart()">
+        </td>
+        <td><textarea class="comments-textarea" placeholder="Observações..."></textarea></td>
+      </tr>
+
+      <!-- RoD-2: Notify -->
+      <tr>
+        <td class="atividade-cell">
+          <div class="title">Notify</div>
+          <div class="subtitle">Manter stakeholders informados sobre incidentes e lançamentos</div>
+        </td>
+        <td class="complement-cell">
+          A notificação ativa e transparente sobre novidades, mudanças significativas de produto e incidentes em produção garante alinhamento com os stakeholders e fortalece a confiança na equipe de engenharia.
+        </td>
+        <td class="criterios-cell">
+          <p><span class="nivel-label">1 – Inicial:</span> Comunicação de releases e incidentes informal e reativa. Usuários e stakeholders descobrem mudanças por acidente. Sem canal oficial de status do sistema.</p>
+          <p><span class="nivel-label">2 – Fundação Técnica:</span> E-mails ou mensagens de release enviados manualmente após deploy. Status page básica para incidentes críticos. Stakeholders internos notificados antes de releases maiores.</p>
+          <p><span class="nivel-label">3 – Abordagem Consistente:</span> Release notes automatizados gerados pelo pipeline. Notificações automáticas para canais de comunicação (Slack, Teams, e-mail). Status page atualizada em tempo real durante incidentes.</p>
+          <p><span class="nivel-label">4 – Alta Eficiência Operacional:</span> Notificações segmentadas por tipo de usuário/stakeholder. Changelog público ou interno atualizado automaticamente. Comunicação proativa de manutenções planejadas com antecedência.</p>
+          <p><span class="nivel-label">5 – Excelência em Engenharia:</span> Sistema de notificação personalizado e omnicanal. Relatórios executivos automatizados sobre frequência de releases e qualidade. Feedback loop dos stakeholders integrado ao planejamento.</p>
+        </td>
+        <td class="pontuacao-cell">
+          <input class="score-input" type="number" min="1" max="5" step="1" data-id="rod-notify" value="" placeholder="–" oninput="updateChart()">
+        </td>
+        <td><textarea class="comments-textarea" placeholder="Observações..."></textarea></td>
+      </tr>
+
+      <!-- RoD-3: Measure -->
+      <tr>
+        <td class="atividade-cell">
+          <div class="title">Measure</div>
+          <div class="subtitle">Medir funcionalidades para oferecer valor com priorização</div>
+        </td>
+        <td class="complement-cell">
+          Medir o impacto real de funcionalidades entregues em produção, vinculando métricas técnicas a resultados de negócio, para orientar a priorização baseada em evidências e não em suposições.
+        </td>
+        <td class="criterios-cell">
+          <p><span class="nivel-label">1 – Inicial:</span> Sem medição do impacto de features em produção. Decisões de produto baseadas em opiniões. Sem KPIs definidos para funcionalidades entregues.</p>
+          <p><span class="nivel-label">2 – Fundação Técnica:</span> Métricas básicas de adoção coletadas (page views, clicks). KPIs de produto definidos informalmente. Análise manual pós-release para features principais.</p>
+          <p><span class="nivel-label">3 – Abordagem Consistente:</span> Hipóteses de negócio definidas antes do desenvolvimento. Instrumentação de analytics integrada ao pipeline de entrega. OKRs linkados a métricas de produto mensuráveis.</p>
+          <p><span class="nivel-label">4 – Alta Eficiência Operacional:</span> A/B testing e experimentos controlados para validação de hipóteses. Funnel analytics detalhado por feature. Decisões de descontinuação de features baseadas em dados de uso.</p>
+          <p><span class="nivel-label">5 – Excelência em Engenharia:</span> Métricas de negócio em tempo real influenciam decisões de engenharia. ROI de features calculado automaticamente. Loop de feedback data-driven entre produto, engenharia e negócio totalmente estabelecido.</p>
+        </td>
+        <td class="pontuacao-cell">
+          <input class="score-input" type="number" min="1" max="5" step="1" data-id="rod-measure" value="" placeholder="–" oninput="updateChart()">
+        </td>
+        <td><textarea class="comments-textarea" placeholder="Observações..."></textarea></td>
+      </tr>
+
+      <!-- RoD-4: Learn -->
+      <tr>
+        <td class="atividade-cell">
+          <div class="title">Learn</div>
+          <div class="subtitle">Aprendizado contínuo a partir de resultados multidisciplinares</div>
+        </td>
+        <td class="complement-cell">
+          Aprendendo e melhorando funcionalidades e resultados multidisciplinares a partir de cada ciclo de entrega, integrando o aprendizado ao próximo planejamento e criando uma cultura de experimentação segura.
+        </td>
+        <td class="criterios-cell">
+          <p><span class="nivel-label">1 – Inicial:</span> Sem processo formal de retrospectiva ou aprendizado. Erros são repetidos por falta de registro. Melhorias dependem de iniciativas individuais. Sem cultura de experimentação.</p>
+          <p><span class="nivel-label">2 – Fundação Técnica:</span> Retrospectivas de sprint realizadas regularmente. Itens de ação gerados e acompanhados. Pós-mortem documentados e compartilhados com a equipe.</p>
+          <p><span class="nivel-label">3 – Abordagem Consistente:</span> Ciclo de aprendizado (Build-Measure-Learn) formalizado. Conhecimento compartilhado entre equipes. Métricas de retrospectiva acompanhadas ao longo do tempo para verificar melhoria real.</p>
+          <p><span class="nivel-label">4 – Alta Eficiência Operacional:</span> Aprendizado multidisciplinar (produto, engenharia, operações) integrado. InnerSource e documentação viva como prática. Experimentações documentadas e resultados compartilhados amplamente.</p>
+          <p><span class="nivel-label">5 – Excelência em Engenharia:</span> Organização que aprende continuamente (learning organization). Contribuições a comunidades externas (open source, conferências). Cultura de inovação e segurança psicológica para experimentar e falhar rápido.</p>
+        </td>
+        <td class="pontuacao-cell">
+          <input class="score-input" type="number" min="1" max="5" step="1" data-id="rod-learn" value="" placeholder="–" oninput="updateChart()">
+        </td>
+        <td><textarea class="comments-textarea" placeholder="Observações..."></textarea></td>
+      </tr>
+
+      <!-- RoD-5: Innovate -->
+      <tr>
+        <td class="atividade-cell">
+          <div class="title">Innovate</div>
+          <div class="subtitle">Liberar funcionalidades com evidências de confiabilidade</div>
+        </td>
+        <td class="complement-cell">
+          Promover a inovação contínua através da adoção de novas práticas, ferramentas e abordagens que aumentam a velocidade de entrega de valor mantendo altos padrões de qualidade e confiabilidade.
+        </td>
+        <td class="criterios-cell">
+          <p><span class="nivel-label">1 – Inicial:</span> Inovação técnica não é estimulada. Adoção de novas ferramentas ocorre por iniciativa individual sem avaliação estruturada. Débito técnico alto e crescente sem plano de endereçamento.</p>
+          <p><span class="nivel-label">2 – Fundação Técnica:</span> Hackathons ou innovation days esporádicos. Proof of concepts realizados para tecnologias promissoras. Algum budget alocado para exploração técnica.</p>
+          <p><span class="nivel-label">3 – Abordagem Consistente:</span> Processo formal de avaliação e adoção de tecnologias (tech radar). Innovation backlog mantido. Tempo dedicado à inovação técnica (20% time ou similar). Débito técnico gerenciado ativamente.</p>
+          <p><span class="nivel-label">4 – Alta Eficiência Operacional:</span> Inovação guiada por métricas de melhoria de fluxo. Automação de tarefas repetitivas como prioridade contínua. Contribuição para o ecossistema externo. Platform engineering como acelerador de inovação.</p>
+          <p><span class="nivel-label">5 – Excelência em Engenharia:</span> Cultura de inovação como diferencial competitivo. Contribuições significativas a projetos open source. Engenharia de plataforma avançada reduzindo cognitive load. Referência externa em práticas de engenharia.</p>
+        </td>
+        <td class="pontuacao-cell">
+          <input class="score-input" type="number" min="1" max="5" step="1" data-id="rod-innovate" value="" placeholder="–" oninput="updateChart()">
+        </td>
+        <td><textarea class="comments-textarea" placeholder="Observações..."></textarea></td>
+      </tr>
+
+      <!-- RoD-6: Decompose -->
+      <tr>
+        <td class="atividade-cell">
+          <div class="title">Decompose</div>
+          <div class="subtitle">Liberar funcionalidades incrementais com autonomia e confiança</div>
+        </td>
+        <td class="complement-cell">
+          Falhas operacionais identificadas que geram funcionalidades conhecidas que melhoram sistemas, plataformas e produtos. Capacidade de decompor épicos e features em entregas independentes e de alto valor.
+        </td>
+        <td class="criterios-cell">
+          <p><span class="nivel-label">1 – Inicial:</span> Features entregues como big-bang. Sem capacidade de decompor incrementalmente. Dependências entre equipes não gerenciadas. Releases grandes e arriscados são a norma.</p>
+          <p><span class="nivel-label">2 – Fundação Técnica:</span> Algumas features decompostas em stories menores. Práticas básicas de vertical slicing introduzidas. Dependências mapeadas manualmente no PI Planning.</p>
+          <p><span class="nivel-label">3 – Abordagem Consistente:</span> Decomposição vertical como prática consistente da equipe. MVPs e MMFs definidos para todas as features. Dependências gerenciadas proativamente. Capacidade de entregar valor a cada sprint.</p>
+          <p><span class="nivel-label">4 – Alta Eficiência Operacional:</span> Decomposição orientada por hypothesis-driven development. Capacidade de liberar partes de features para subgrupos de usuários. Independência de deploy entre serviços/equipes alcançada.</p>
+          <p><span class="nivel-label">5 – Excelência em Engenharia:</span> Arquitetura orientada a entregabilidade contínua. Strangler fig e outras técnicas avançadas para modernização incremental. Zero dependências bloqueantes entre equipes para release.</p>
+        </td>
+        <td class="pontuacao-cell">
+          <input class="score-input" type="number" min="1" max="5" step="1" data-id="rod-decompose" value="" placeholder="–" oninput="updateChart()">
+        </td>
+        <td><textarea class="comments-textarea" placeholder="Observações..."></textarea></td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <!-- ── FOOTER ── -->
+  <div class="footer">
+    <button class="btn btn-print" onclick="window.print()">Imprimir / Salvar PDF</button>
+    <button class="btn btn-reset" onclick="resetForm()">Limpar Pontuações</button>
+  </div>
+</div>
+
+<script>
+  // ── CHART SETUP ──
+  const labels = [
+    'Develop','Build','Test E2E','Stage','Confiabilidade CI',
+    'Deploy','Verify','Monitor','Respond','Observability',
+    'Release','Notify','Measure','Learn','Innovate','Decompose'
+  ];
+
+  const ids = [
+    'ci-develop','ci-build','ci-test','ci-stage','ci-reliability',
+    'cd-deploy','cd-verify','cd-monitor','cd-respond','cd-observability',
+    'rod-release','rod-notify','rod-measure','rod-learn','rod-innovate','rod-decompose'
+  ];
+
+  const ctx = document.getElementById('radarChart').getContext('2d');
+  const radarChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Maturidade',
+        data: new Array(16).fill(0),
+        backgroundColor: 'rgba(46,109,164,0.18)',
+        borderColor: '#2e6da4',
+        borderWidth: 2,
+        pointBackgroundColor: '#f48120',
+        pointRadius: 4,
+        pointHoverRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        r: {
+          min: 0,
+          max: 5,
+          ticks: {
+            stepSize: 1,
+            font: { size: 8 },
+            color: '#555'
+          },
+          pointLabels: { font: { size: 8 }, color: '#1b3a6b' },
+          grid: { color: '#dde7f3' },
+          angleLines: { color: '#ccd9ec' }
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+
+  function updateChart() {
+    const data = ids.map(id => {
+      const el = document.querySelector(`[data-id="${id}"]`);
+      const v = parseFloat(el.value);
+      return (v >= 1 && v <= 5) ? v : 0;
+    });
+    radarChart.data.datasets[0].data = data;
+    radarChart.update();
+  }
+
+  function resetForm() {
+    document.querySelectorAll('.score-input').forEach(el => el.value = '');
+    document.querySelectorAll('.comments-textarea').forEach(el => el.value = '');
+    document.getElementById('artName').value = '';
+    document.getElementById('assessmentDate').value = '';
+    updateChart();
+  }
+
+  // Set today's date by default
+  document.getElementById('assessmentDate').valueAsDate = new Date();
+</script>
+</body>
+</html>
