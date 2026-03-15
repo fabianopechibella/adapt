@@ -1,0 +1,18 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "README.md",
+      "*.zip"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/lpm-budget.html"
+      }
+    ]
+  }
+}
