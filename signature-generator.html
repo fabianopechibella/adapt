@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Assinatura — Adapt Works</title>
+  <style>
+    :root {
+      --orange1: #F07A28; --orange2: #F4A020; --amber: #F5CE30;
+      --navy: #163440; --blueDeep: #1B4A5C; --steel: #2D6E8A;
+      --cyan: #2B8CAC; --teal: #2AABBC;
+      --paper: #F2F8FA; --line: #A8CBDA; --text: #334155;
+      --shadow: 0 10px 30px rgba(22,52,64,.08); --radius-xl: 28px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      color: var(--text);
+      background: linear-gradient(160deg, #fff 0%, var(--paper) 100%);
+      min-height: 100vh;
+    }
+    .page {
+      max-width: 1340px;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      gap: 16px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 28px;
+    }
+    .header-logo { display: flex; align-items: center; gap: 12px; }
+    .header-logo img { height: 52px; width: auto; }
+    .header-title { font-size: 20px; font-weight: 900; color: var(--navy); }
+    .header-sub { font-size: 10.5px; color: #64748b; text-transform: uppercase; letter-spacing: .12em; font-weight: 700; margin-top: 2px; }
+
+    /* ── MAIN GRID ── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-head {
+      background: var(--navy);
+      color: #fff;
+      padding: 14px 22px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+    }
+    .card-body { padding: 22px; }
+
+    /* ── FORM ── */
+    .field-group { margin-bottom: 16px; }
+    .field-group:last-child { margin-bottom: 0; }
+    label {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--blueDeep);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      margin-bottom: 6px;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="url"],
+    input[type="tel"] {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--paper);
+      font-size: 13px;
+      padding: 9px 14px;
+      outline: none;
+      color: var(--navy);
+      font-family: inherit;
+      font-weight: 600;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    input:focus {
+      border-color: var(--teal);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(42,171,188,.12);
+    }
+    .field-hint { font-size: 10px; color: #94a3b8; margin-top: 4px; }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--line);
+      margin: 20px 0;
+    }
+    .section-label {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      color: var(--orange1);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    /* ── BTN ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all .2s;
+      font-family: inherit;
+    }
+    .btn-primary { background: var(--orange1); color: #fff; }
+    .btn-primary:hover { background: var(--orange2); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(240,122,40,.35); }
+    .btn-outline { background: transparent; color: var(--navy); border: 2px solid var(--line); }
+    .btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+    .btn-copy { background: var(--navy); color: #fff; }
+    .btn-copy:hover { background: var(--blueDeep); transform: translateY(-1px); }
+    .btn-success { background: #16a34a; color: #fff; }
+
+    /* ── PREVIEW PANEL ── */
+    .preview-panel { display: grid; gap: 16px; }
+
+    .preview-box {
+      padding: 22px;
+      background: #f8fafc;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+    }
+    .preview-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      margin-bottom: 14px;
+    }
+    .preview-inner {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+    }
+
+    /* ── HTML OUTPUT ── */
+    .code-box {
+      position: relative;
+    }
+    .code-output {
+      width: 100%;
+      min-height: 120px;
+      max-height: 240px;
+      overflow-y: auto;
+      background: var(--navy);
+      color: #a5f3fc;
+      border-radius: 14px;
+      padding: 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 10.5px;
+      line-height: 1.5;
+      border: none;
+      resize: vertical;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .copy-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .copy-feedback {
+      font-size: 11px;
+      color: #16a34a;
+      font-weight: 700;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .copy-feedback.show { opacity: 1; }
+
+    /* ── SIGNATURE PREVIEW HTML (mirrors email signature design) ── */
+    #sig-preview-mount table { border-spacing: 0; border-collapse: collapse; }
+
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-logo">
+      <img src="logo-adaptworks.svg" alt="AdaptWorks">
+      <div>
+        <div class="header-title">Gerador de Assinatura</div>
+        <div class="header-sub">Adapt Works · Email Signature Builder</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <div class="main-grid">
+
+    <!-- ── LEFT: FORM ── -->
+    <div class="card">
+      <div class="card-head">⚙ Dados da Assinatura</div>
+      <div class="card-body">
+
+        <div class="section-label">Identificação</div>
+
+        <div class="field-group">
+          <label>Nome Completo</label>
+          <input type="text" id="f-name" placeholder="Ex: Fabiano Pechibella" oninput="updatePreview()">
+        </div>
+        <div class="field-group">
+          <label>Cargo / Especialidade</label>
+          <input type="text" id="f-title" placeholder="Ex: Consultoria e Formação" oninput="updatePreview()">
+        </div>
+
+        <hr class="section-divider">
+        <div class="section-label">Contato</div>
+
+        <div class="field-group">
+          <label>Telefone / Celular</label>
+          <input type="tel" id="f-phone" placeholder="Ex: +55 41 99877-7917" oninput="updatePreview()">
+        </div>
+        <div class="field-group">
+          <label>E-mail</label>
+          <input type="email" id="f-email" placeholder="Ex: nome@adaptworks.com.br" oninput="updatePreview()">
+        </div>
+        <div class="field-group">
+          <label>WhatsApp</label>
+          <input type="tel" id="f-whatsapp" placeholder="Ex: (41) 99877-7917" oninput="updatePreview()">
+        </div>
+
+        <hr class="section-divider">
+        <div class="section-label">Imagem e Links</div>
+
+        <div class="field-group">
+          <label>URL da Foto</label>
+          <input type="url" id="f-photo" placeholder="https://…/foto.jpg" oninput="updatePreview()">
+          <div class="field-hint">Deixe em branco para usar a foto padrão</div>
+        </div>
+        <div class="field-group">
+          <label>Link LinkedIn</label>
+          <input type="url" id="f-linkedin" placeholder="https://linkedin.com/in/…" oninput="updatePreview()">
+        </div>
+        <div class="field-group">
+          <label>Link Instagram</label>
+          <input type="url" id="f-instagram" placeholder="https://instagram.com/…" oninput="updatePreview()">
+        </div>
+        <div class="field-group">
+          <label>Link Facebook</label>
+          <input type="url" id="f-facebook" placeholder="https://facebook.com/…" oninput="updatePreview()">
+        </div>
+
+        <hr class="section-divider">
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="loadDefaults()">▶ Carregar Exemplo</button>
+          <button class="btn btn-outline" onclick="clearForm()">✕ Limpar</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── RIGHT: PREVIEW + OUTPUT ── -->
+    <div class="preview-panel">
+
+      <!-- VISUAL PREVIEW -->
+      <div class="card">
+        <div class="card-head">👁 Pré-visualização</div>
+        <div class="card-body">
+          <div class="preview-box">
+            <div class="preview-label">Assinatura de e-mail (700 px)</div>
+            <div class="preview-inner" id="sig-preview-mount">
+              <!-- preview injected by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HTML OUTPUT -->
+      <div class="card">
+        <div class="card-head">🗒 HTML para copiar</div>
+        <div class="card-body">
+          <p style="font-size:11px;color:#64748b;margin-bottom:12px;">Cole este código no campo de assinatura do seu cliente de e-mail (Gmail, Outlook, etc.).</p>
+          <div class="code-box">
+            <textarea class="code-output" id="html-output" readonly spellcheck="false"></textarea>
+          </div>
+          <div class="copy-row">
+            <button class="btn btn-copy" id="copy-btn" onclick="copyHTML()">📋 Copiar HTML</button>
+            <span class="copy-feedback" id="copy-feedback">✔ Copiado!</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /preview-panel -->
+  </div><!-- /main-grid -->
+</div><!-- /page -->
+
+<script>
+  const RAW = 'https://raw.githubusercontent.com/fabianopechibella/adapt/refs/heads/main/';
+
+  /* ── DEFAULTS (Fabiano example) ── */
+  const DEFAULTS = {
+    name:      'Fabiano Pechibella',
+    title:     'Consultoria e Formação',
+    phone:     '+55 41 99877-7917',
+    email:     'fpechibella@adaptworks.com.br',
+    whatsapp:  '(11) 91355-1131',
+    photo:     RAW + 'FMP%20-%202026%20-%20v1_r1_c1.png',
+    linkedin:  'https://www.linkedin.com/company/adaptworks',
+    instagram: 'https://www.instagram.com/adaptworks/',
+    facebook:  'https://www.facebook.com/adaptworks/',
+  };
+
+  function loadDefaults() {
+    document.getElementById('f-name').value      = DEFAULTS.name;
+    document.getElementById('f-title').value     = DEFAULTS.title;
+    document.getElementById('f-phone').value     = DEFAULTS.phone;
+    document.getElementById('f-email').value     = DEFAULTS.email;
+    document.getElementById('f-whatsapp').value  = DEFAULTS.whatsapp;
+    document.getElementById('f-photo').value     = DEFAULTS.photo;
+    document.getElementById('f-linkedin').value  = DEFAULTS.linkedin;
+    document.getElementById('f-instagram').value = DEFAULTS.instagram;
+    document.getElementById('f-facebook').value  = DEFAULTS.facebook;
+    updatePreview();
+  }
+
+  function clearForm() {
+    ['f-name','f-title','f-phone','f-email','f-whatsapp','f-photo','f-linkedin','f-instagram','f-facebook']
+      .forEach(id => document.getElementById(id).value = '');
+    updatePreview();
+  }
+
+  function val(id) { return (document.getElementById(id).value || '').trim(); }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ── SIGNATURE HTML BUILDER ── */
+  function buildSignatureHTML(data) {
+    const {name, title, phone, email, whatsapp, photo, linkedin, instagram, facebook} = data;
+
+    const photoSrc    = photo     || RAW + 'FMP%20-%202026%20-%20v1_r1_c1.png';
+    const logosSrc    = RAW + 'FMP%20-%202026%20-%20v1_r1_c3.png';
+    const wppIcon     = RAW + 'wpp.png';
+    const mailIcon    = RAW + 'mail.png';
+    const siteIcon    = RAW + 'site.png';
+    const wppBIcon    = RAW + 'wpp-b.png';
+    const igIcon      = RAW + 'instagram.png';
+    const liIcon      = RAW + 'linkedin.png';
+    const fbIcon      = RAW + 'facebook.png';
+
+    const phoneTd = phone ? `
+              <tr>
+                <td style="padding:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#222222;vertical-align:middle;">
+                  <img src="${wppIcon}" width="14" height="14" alt="Tel" style="display:inline-block;vertical-align:middle;margin-right:5px;border:0;">
+                  <span style="vertical-align:middle;">${escHtml(phone)}</span>
+                </td>
+              </tr>` : '';
+
+    const emailTd = email ? `
+              <tr>
+                <td style="padding:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#222222;vertical-align:middle;">
+                  <img src="${mailIcon}" width="14" height="14" alt="Email" style="display:inline-block;vertical-align:middle;margin-right:5px;border:0;">
+                  <a href="mailto:${escHtml(email)}" style="color:#1155cc;text-decoration:none;vertical-align:middle;">${escHtml(email)}</a>
+                </td>
+              </tr>` : '';
+
+    const igLink  = instagram ? `<a href="${escHtml(instagram)}" target="_blank" style="text-decoration:none;margin-left:4px;"><img src="${igIcon}" width="20" height="20" alt="Instagram" style="border:0;display:inline-block;vertical-align:middle;"></a>` : '';
+    const liLink  = linkedin  ? `<a href="${escHtml(linkedin)}"  target="_blank" style="text-decoration:none;margin-left:4px;"><img src="${liIcon}" width="20" height="20" alt="LinkedIn"  style="border:0;display:inline-block;vertical-align:middle;"></a>` : '';
+    const fbLink  = facebook  ? `<a href="${escHtml(facebook)}"  target="_blank" style="text-decoration:none;margin-left:4px;"><img src="${fbIcon}" width="20" height="20" alt="Facebook"  style="border:0;display:inline-block;vertical-align:middle;"></a>` : '';
+
+    return `<!-- Assinatura Adapt Works -->
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="700" style="width:700px;max-width:700px;border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">
+
+  <!-- ROW 1: Photo | Info | Logos -->
+  <tr>
+    <!-- Photo -->
+    <td width="130" style="width:130px;padding:0;background:#111111;vertical-align:bottom;">
+      <img src="${photoSrc}" width="130" alt="${escHtml(name || 'Adapt Works')}" style="display:block;border:0;width:130px;height:auto;">
+    </td>
+
+    <!-- Info -->
+    <td style="padding:14px 14px 14px 18px;vertical-align:top;background:#ffffff;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+              <tr>
+                <td style="padding:0 0 3px 0;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;color:#111111;line-height:20px;">
+                  ${escHtml(name || 'Nome')}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:0 0 9px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#F07A28;font-weight:600;line-height:18px;">
+                  ${escHtml(title || 'Cargo')}
+                </td>
+              </tr>${phoneTd}${emailTd}
+      </table>
+    </td>
+
+    <!-- Logos / Brand -->
+    <td width="150" style="width:150px;padding:0;background:#ffffff;vertical-align:top;text-align:right;">
+      <img src="${logosSrc}" width="140" alt="Scaled Agile Partner" style="display:block;border:0;width:140px;height:auto;margin-left:auto;">
+    </td>
+  </tr>
+
+  <!-- ROW 2: Bottom bar -->
+  <tr>
+    <td colspan="3" style="background:#F07A28;padding:9px 16px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <!-- Site link -->
+          <td style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#ffffff;font-weight:700;white-space:nowrap;padding-right:12px;vertical-align:middle;">
+            <img src="${siteIcon}" width="14" height="14" alt="Site" style="display:inline-block;vertical-align:middle;margin-right:5px;border:0;">
+            <a href="https://adapt.works/" target="_blank" style="color:#ffffff;text-decoration:none;vertical-align:middle;">AdaptWorks</a>
+          </td>
+          <!-- WhatsApp -->
+          <td style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#ffffff;font-weight:700;white-space:nowrap;padding-right:12px;vertical-align:middle;">
+            <img src="${wppBIcon}" width="14" height="14" alt="WhatsApp" style="display:inline-block;vertical-align:middle;margin-right:5px;border:0;">
+            <span style="vertical-align:middle;">${escHtml(whatsapp || '')}</span>
+          </td>
+          <!-- Siga nossas redes -->
+          <td style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#ffffff;font-weight:700;vertical-align:middle;text-align:right;">
+            Siga nossas redes &nbsp;${igLink}${liLink}${fbLink}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+</table>`;
+  }
+
+  /* ── UPDATE PREVIEW ── */
+  function updatePreview() {
+    const data = {
+      name:      val('f-name'),
+      title:     val('f-title'),
+      phone:     val('f-phone'),
+      email:     val('f-email'),
+      whatsapp:  val('f-whatsapp'),
+      photo:     val('f-photo'),
+      linkedin:  val('f-linkedin'),
+      instagram: val('f-instagram'),
+      facebook:  val('f-facebook'),
+    };
+
+    const html = buildSignatureHTML(data);
+    document.getElementById('sig-preview-mount').innerHTML = html;
+    document.getElementById('html-output').value = html;
+  }
+
+  /* ── COPY HTML ── */
+  function copyHTML() {
+    const text = document.getElementById('html-output').value;
+    navigator.clipboard.writeText(text).then(() => {
+      const fb = document.getElementById('copy-feedback');
+      fb.classList.add('show');
+      setTimeout(() => fb.classList.remove('show'), 2500);
+    }).catch(() => {
+      // fallback
+      document.getElementById('html-output').select();
+      document.execCommand('copy');
+    });
+  }
+
+  /* ── INIT ── */
+  loadDefaults();
+</script>
+</body>
+</html>
