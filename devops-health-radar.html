@@ -277,6 +277,213 @@
     .score-4 { background: #d4f0d4; color: #1a6b1a; }
     .score-5 { background: #b8e0ff; color: #004a99; }
 
+    /* ── ANALYSIS SECTION ── */
+    .analysis-section {
+      margin-top: 32px;
+      border-top: 3px solid #1b3a6b;
+      padding-top: 20px;
+    }
+    .analysis-section h2 {
+      font-size: 15px;
+      color: #1b3a6b;
+      font-weight: 700;
+      margin-bottom: 18px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-left: 5px solid #f48120;
+      padding-left: 10px;
+    }
+    .analysis-block {
+      margin-bottom: 28px;
+    }
+    .analysis-block h3 {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      background: #2e6da4;
+      padding: 6px 12px;
+      margin-bottom: 0;
+      border-radius: 4px 4px 0 0;
+    }
+    .analysis-block-body {
+      border: 1px solid #b0c8e0;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      padding: 12px;
+      background: #f9fbff;
+    }
+
+    /* Consolidation table */
+    .consolidation-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+    .consolidation-table th {
+      background: #1b3a6b;
+      color: #fff;
+      padding: 5px 8px;
+      text-align: left;
+      font-weight: 600;
+    }
+    .consolidation-table td {
+      padding: 5px 8px;
+      border-bottom: 1px solid #dde7f3;
+      vertical-align: middle;
+    }
+    .consolidation-table tr:nth-child(even) td { background: #eef4fb; }
+    .consolidation-table tr:nth-child(odd)  td { background: #ffffff; }
+    .consolidation-table .section-sep td {
+      background: #dce8f5 !important;
+      font-weight: 700;
+      color: #1b3a6b;
+      font-size: 10px;
+      padding: 4px 8px;
+    }
+    .consolidation-table .avg-row td {
+      background: #1b3a6b !important;
+      color: #fff !important;
+      font-weight: 700;
+    }
+
+    /* Score bar */
+    .score-bar-wrap { display: flex; align-items: center; gap: 6px; }
+    .score-bar-bg {
+      flex: 1;
+      height: 10px;
+      background: #dde7f3;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 5px;
+      transition: width .3s;
+    }
+    .bar-1 { background: #e05252; }
+    .bar-2 { background: #e88730; }
+    .bar-3 { background: #d4b800; }
+    .bar-4 { background: #4caf50; }
+    .bar-5 { background: #1b7fc4; }
+    .score-val { font-weight: 700; font-size: 12px; min-width: 18px; text-align: right; }
+    .score-na  { color: #aaa; font-style: italic; font-size: 11px; }
+
+    /* Pill badges */
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .pill-critical  { background: #fde8e8; color: #a00; border: 1px solid #f5b8b8; }
+    .pill-warning   { background: #fff0d8; color: #854d00; border: 1px solid #ffd08a; }
+    .pill-moderate  { background: #fff9c8; color: #7a5c00; border: 1px solid #ead96a; }
+    .pill-ok        { background: #d8f5d8; color: #1a6b1a; border: 1px solid #8dd88d; }
+    .pill-excellent { background: #d0e8ff; color: #004a99; border: 1px solid #80b8f0; }
+
+    /* Analysis cards (items ≤ 3) */
+    .analysis-cards { display: flex; flex-direction: column; gap: 10px; }
+    .analysis-card {
+      border-left: 4px solid #e05252;
+      background: #fff;
+      border-radius: 0 6px 6px 0;
+      padding: 10px 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.07);
+    }
+    .analysis-card.score-2 { border-left-color: #e88730; }
+    .analysis-card.score-3 { border-left-color: #d4b800; }
+    .analysis-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .analysis-card-title { font-weight: 700; font-size: 12px; color: #1b3a6b; }
+    .analysis-card-section { font-size: 10px; color: #666; font-style: italic; }
+    .analysis-card-body { font-size: 11px; line-height: 1.55; color: #333; }
+    .analysis-card-body strong { color: #1b3a6b; }
+
+    /* Proposals */
+    .proposal-card {
+      background: #fff;
+      border: 1px solid #b0c8e0;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .proposal-card-header {
+      background: linear-gradient(135deg, #1b3a6b 0%, #2e6da4 100%);
+      color: #fff;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .proposal-card-header .activity-name { font-weight: 700; font-size: 12px; }
+    .proposal-card-header .section-tag {
+      font-size: 9px;
+      background: rgba(255,255,255,.2);
+      padding: 2px 7px;
+      border-radius: 8px;
+    }
+    .proposal-card-body { padding: 10px 14px; }
+    .proposal-current {
+      font-size: 11px;
+      color: #555;
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      background: #f5f7fa;
+      border-radius: 4px;
+      border-left: 3px solid #aaa;
+    }
+    .proposal-actions { margin: 0; padding: 0; list-style: none; }
+    .proposal-actions li {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      padding: 5px 0;
+      border-bottom: 1px dashed #e0e8f0;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #222;
+    }
+    .proposal-actions li:last-child { border-bottom: none; }
+    .proposal-actions li::before {
+      content: '→';
+      color: #f48120;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .priority-badge {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .pri-high   { background: #fde8e8; color: #a00; }
+    .pri-medium { background: #fff0d8; color: #854d00; }
+    .pri-low    { background: #d8f5d8; color: #1a6b1a; }
+
+    .no-issues {
+      text-align: center;
+      padding: 20px;
+      color: #4caf50;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .hint-text {
+      text-align: center;
+      padding: 20px;
+      color: #aaa;
+      font-style: italic;
+      font-size: 11px;
+    }
+
     @media print {
       body { font-size: 9px; }
       .page { width: 100%; padding: 10px; }
@@ -284,6 +491,7 @@
       .score-input { border: 1px solid #999; background: transparent; }
       .comments-textarea { border: 1px solid #999; }
       .radar-wrap canvas { max-width: 260px; max-height: 260px; }
+      .analysis-card, .proposal-card { page-break-inside: avoid; }
     }
   </style>
 </head>
@@ -775,8 +983,52 @@
   <!-- ── FOOTER ── -->
   <div class="footer">
     <button class="btn btn-print" onclick="window.print()">Imprimir / Salvar PDF</button>
+    <button class="btn" style="background:#f48120;color:#fff;" onclick="generateAnalysis()">Gerar Análise</button>
     <button class="btn btn-reset" onclick="resetForm()">Limpar Pontuações</button>
   </div>
+
+  <!-- ══════════════════════════════════════════════════
+       ANALYSIS SECTION
+       ══════════════════════════════════════════════════ -->
+  <div class="analysis-section" id="analysisSection" style="display:none;">
+    <h2>Análise do Assessment</h2>
+
+    <!-- 1. CONSOLIDAÇÃO -->
+    <div class="analysis-block">
+      <h3>1. Consolidação dos Dados Coletados</h3>
+      <div class="analysis-block-body">
+        <table class="consolidation-table" id="consolidationTable">
+          <thead>
+            <tr>
+              <th style="width:130px;">Seção</th>
+              <th style="width:160px;">Atividade</th>
+              <th>Nível Atual</th>
+              <th style="width:220px;">Pontuação</th>
+              <th style="width:100px;">Status</th>
+            </tr>
+          </thead>
+          <tbody id="consolidationBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2. ANÁLISE -->
+    <div class="analysis-block">
+      <h3>2. Análise das Informações Obtidas — Aspectos com Pontuação ≤ 3</h3>
+      <div class="analysis-block-body">
+        <div class="analysis-cards" id="analysisCards"></div>
+      </div>
+    </div>
+
+    <!-- 3. PROPOSIÇÃO -->
+    <div class="analysis-block">
+      <h3>3. Proposição de Alternativas de Melhoria</h3>
+      <div class="analysis-block-body">
+        <div id="proposalCards"></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -851,6 +1103,609 @@
 
   // Set today's date by default
   document.getElementById('assessmentDate').valueAsDate = new Date();
+
+  // ══════════════════════════════════════════════
+  // ACTIVITY METADATA
+  // ══════════════════════════════════════════════
+  const activities = [
+    // id, label, section, current-level descriptions [idx 0=level1 … 4=level5], proposals per level
+    {
+      id: 'ci-develop', label: 'Develop', section: 'Continuous Integration',
+      levels: [
+        'Sem pipeline estruturado; deploys manuais e sem controle de versão padronizado.',
+        'Repositório compartilhado e pipelines básicos de CI criados com build e testes simples.',
+        'CI executado a cada commit; revisões de código e cobertura de testes acompanhadas.',
+        'Feature flags e trunk-based development adotados; lead time < 1 hora.',
+        'Pipeline totalmente otimizado; experimentação contínua e métricas avançadas de fluxo.'
+      ],
+      proposals: [
+        [ // level 1 → 2
+          { text: 'Implementar repositório Git centralizado com política básica de branching (ex.: GitFlow ou trunk-based).', pri: 'high' },
+          { text: 'Criar pipeline de CI mínimo com etapa de build e execução de testes unitários.', pri: 'high' },
+          { text: 'Definir responsável pelo pipeline e documentar o processo inicial.', pri: 'medium' }
+        ],
+        [ // level 2 → 3
+          { text: 'Configurar o pipeline para disparar a cada commit/PR, bloqueando merge em caso de falha.', pri: 'high' },
+          { text: 'Instituir prática de code review obrigatório antes do merge.', pri: 'high' },
+          { text: 'Medir e publicar cobertura de testes; definir meta mínima (ex.: 60%).', pri: 'medium' }
+        ],
+        [ // level 3 → 4
+          { text: 'Adotar trunk-based development e feature flags para desacoplar deploy de release.', pri: 'high' },
+          { text: 'Integrar análise estática de código (SonarQube, ESLint, etc.) ao pipeline.', pri: 'medium' },
+          { text: 'Reduzir lead time de commit para produção para menos de 1 hora.', pri: 'medium' }
+        ]
+      ]
+    },
+    {
+      id: 'ci-build', label: 'Build', section: 'Continuous Integration',
+      levels: [
+        'Integrações raras; build executado manualmente; falhas não são prioritárias.',
+        'Build automatizado básico; testes unitários executados; taxa de sucesso monitorada informalmente.',
+        'Todo commit dispara build; política de "build verde primeiro"; testes unitários e de integração.',
+        'Build em < 10 min; cobertura > 80%; artefatos versionados e imutáveis.',
+        'Build com paralelização e caching; zero tolerância a builds quebrados; pipeline multi-estágio.'
+      ],
+      proposals: [
+        [
+          { text: 'Configurar ferramenta de CI (GitHub Actions, Jenkins, GitLab CI) para builds automáticos.', pri: 'high' },
+          { text: 'Adicionar testes unitários básicos ao pipeline e exibir resultados no PR.', pri: 'high' },
+          { text: 'Criar alerta automático em caso de falha de build para o time.', pri: 'medium' }
+        ],
+        [
+          { text: 'Estabelecer política de "build verde obrigatório" antes de qualquer merge.', pri: 'high' },
+          { text: 'Expandir testes para cobrir módulos de integração críticos.', pri: 'high' },
+          { text: 'Monitorar taxa de sucesso de build semanalmente em reunião de equipe.', pri: 'low' }
+        ],
+        [
+          { text: 'Otimizar pipeline para concluir em menos de 10 minutos (paralelização, caching).', pri: 'high' },
+          { text: 'Garantir cobertura de testes acima de 80% nos módulos críticos.', pri: 'medium' },
+          { text: 'Versionar artefatos de build e torná-los imutáveis para rastreabilidade.', pri: 'medium' }
+        ]
+      ]
+    },
+    {
+      id: 'ci-test', label: 'Test End-to-End', section: 'Continuous Integration',
+      levels: [
+        'Testes E2E manuais e esporádicos; ambiente de teste muito diferente de produção.',
+        'Ambiente de homologação disponível; testes E2E parcialmente automatizados para fluxos críticos.',
+        'Ambiente paritário com produção; testes E2E automatizados como gate de promoção.',
+        'Testes E2E no pipeline com execução paralela; testes de contrato em uso.',
+        'Pirâmide de testes otimizada; ambiente efêmero por PR; qualidade como responsabilidade coletiva.'
+      ],
+      proposals: [
+        [
+          { text: 'Criar ambiente de homologação isolado e documentar diferenças em relação a produção.', pri: 'high' },
+          { text: 'Automatizar os 3 fluxos mais críticos com ferramenta de E2E (Cypress, Playwright, Selenium).', pri: 'high' },
+          { text: 'Incluir execução dos testes E2E como etapa obrigatória no pipeline de release.', pri: 'medium' }
+        ],
+        [
+          { text: 'Garantir paridade de configuração entre staging e produção via IaC.', pri: 'high' },
+          { text: 'Ampliar cobertura E2E para todos os happy paths e principais casos negativos.', pri: 'medium' },
+          { text: 'Implementar gestão de dados de teste (fixtures, factories) para estabilizar os testes.', pri: 'medium' }
+        ],
+        [
+          { text: 'Paralelizar execução dos testes E2E para reduzir tempo de feedback.', pri: 'high' },
+          { text: 'Adotar contract testing (Pact) para validar integrações entre serviços.', pri: 'medium' },
+          { text: 'Implementar ambientes efêmeros por pull request para isolamento de testes.', pri: 'low' }
+        ]
+      ]
+    },
+    {
+      id: 'ci-stage', label: 'Stage', section: 'Continuous Integration',
+      levels: [
+        'Não há ambiente de staging; validações ocorrem diretamente em produção.',
+        'Staging existe mas diverge de produção; promoção de artefatos feita manualmente.',
+        'Staging com paridade para componentes principais; processo documentado; testes de aceitação sistemáticos.',
+        'Staging provisionado via IaC; promoção automática após aprovação; dados anonimizados de produção.',
+        'Staging totalmente automatizado com validações de segurança, performance e compliance.'
+      ],
+      proposals: [
+        [
+          { text: 'Provisionar ambiente de staging dedicado e documentar suas configurações.', pri: 'high' },
+          { text: 'Criar checklist de validação manual a ser executado antes de promover para produção.', pri: 'medium' },
+          { text: 'Iniciar mapeamento das divergências de configuração em relação à produção.', pri: 'medium' }
+        ],
+        [
+          { text: 'Alinhar configurações de staging com produção usando Infrastructure as Code (Terraform, Ansible).', pri: 'high' },
+          { text: 'Automatizar a promoção de artefatos do pipeline de CI para staging.', pri: 'high' },
+          { text: 'Executar suite de testes de aceitação de forma sistemática em staging antes de cada release.', pri: 'medium' }
+        ],
+        [
+          { text: 'Implementar pipeline automatizado de promoção staging → produção com gate de aprovação.', pri: 'high' },
+          { text: 'Utilizar dados anonimizados de produção para popular o ambiente de staging.', pri: 'medium' },
+          { text: 'Adicionar testes de performance e segurança ao pipeline de staging.', pri: 'medium' }
+        ]
+      ]
+    },
+    {
+      id: 'ci-reliability', label: 'Confiabilidade da Integração', section: 'Continuous Integration',
+      levels: [
+        'Sem métricas de confiabilidade; falhas descobertas tardiamente; sem rastreabilidade.',
+        'Taxa de sucesso de build e tempo de ciclo começam a ser coletados; alertas básicos existem.',
+        'DORA metrics básicas medidas; dashboard de CI disponível; retrospectivas incluem métricas de pipeline.',
+        'Todas as DORA metrics rastreadas; SLOs do pipeline definidos; análise de causa raiz estruturada.',
+        'Métricas preditivas e alertas proativos; melhoria contínua orientada por dados; benchmarking.'
+      ],
+      proposals: [
+        [
+          { text: 'Habilitar coleta de métricas básicas no servidor de CI (taxa de sucesso, tempo médio de build).', pri: 'high' },
+          { text: 'Configurar alertas automáticos de falha de build para o canal de comunicação da equipe.', pri: 'high' },
+          { text: 'Criar rastreabilidade entre commits e deploys com tags ou release notes automáticos.', pri: 'medium' }
+        ],
+        [
+          { text: 'Implementar medição das 4 DORA metrics: deployment frequency, lead time, MTTR e change failure rate.', pri: 'high' },
+          { text: 'Criar dashboard de CI visível para toda a equipe (ex.: Grafana, Datadog, CI nativo).', pri: 'medium' },
+          { text: 'Incluir revisão das métricas de pipeline nas retrospectivas de sprint.', pri: 'low' }
+        ],
+        [
+          { text: 'Definir SLOs para o pipeline (ex.: "95% dos builds em < 10 min") e monitorá-los.', pri: 'high' },
+          { text: 'Estruturar processo de análise de causa raiz para falhas de pipeline recorrentes.', pri: 'medium' },
+          { text: 'Realizar trend analysis mensal das métricas para identificar regressões.', pri: 'medium' }
+        ]
+      ]
+    },
+    {
+      id: 'cd-deploy', label: 'Deploy', section: 'Continuous Deployment',
+      levels: [
+        'Deploys manuais, raros e de alto risco; rollback manual sem procedimento documentado.',
+        'Scripts básicos de deploy; deploys mensais/por sprint; checklist documentado; rollback manual.',
+        'Pipeline de deploy automatizado; deploys semanais; aprovações formais; rollback automatizado.',
+        'Deploy sob demanda ou automatizado; blue/green ou canary em uso; MTTR baixo.',
+        'CD contínuo com validação automática pós-deploy; múltiplos deploys por dia; zero-downtime.'
+      ],
+      proposals: [
+        [
+          { text: 'Criar scripts de deploy reproduzíveis e documentar o processo em um runbook.', pri: 'high' },
+          { text: 'Implementar procedimento de rollback documentado e testado.', pri: 'high' },
+          { text: 'Reduzir janelas de manutenção realizando deploys fora do horário de pico inicialmente.', pri: 'medium' }
+        ],
+        [
+          { text: 'Automatizar o pipeline de deploy para produção com gate de aprovação humana.', pri: 'high' },
+          { text: 'Aumentar frequência de deploys para pelo menos semanal.', pri: 'high' },
+          { text: 'Implementar rollback automatizado em caso de falha pós-deploy.', pri: 'medium' }
+        ],
+        [
+          { text: 'Adotar estratégia de blue/green ou canary deployment para reduzir risco.', pri: 'high' },
+          { text: 'Permitir deploy sob demanda (one-click ou totalmente automatizado).', pri: 'medium' },
+          { text: 'Medir e reduzir MTTR (Mean Time to Recovery) abaixo de 1 hora.', pri: 'medium' }
+        ]
+      ]
+    },
+    {
+      id: 'cd-verify', label: 'Verify', section: 'Continuous Deployment',
+      levels: [
+        'Verificação pós-deploy manual e inconsistente; problemas descobertos pelos usuários.',
+        'Smoke tests manuais; checklist documentado; monitoramento básico de disponibilidade.',
+        'Smoke tests automatizados; healthchecks monitorados; alertas configurados pós-deploy.',
+        'Suite completa de testes automáticos pós-deploy; gate automático de rollback por degradação.',
+        'Verificação inteligente com análise de anomalias; progressive delivery com validação contínua.'
+      ],
+      proposals: [
+        [
+          { text: 'Criar checklist formal de verificação pós-deploy e torná-lo obrigatório.', pri: 'high' },
+          { text: 'Configurar monitoramento básico de disponibilidade (uptime check) para os serviços principais.', pri: 'high' },
+          { text: 'Implementar smoke tests manuais cobrindo os 5 fluxos mais críticos.', pri: 'medium' }
+        ],
+        [
+          { text: 'Automatizar smoke tests para execução imediata após cada deploy.', pri: 'high' },
+          { text: 'Configurar healthchecks em todos os endpoints críticos com alertas automáticos.', pri: 'high' },
+          { text: 'Integrar resultado dos testes de verificação ao pipeline (bloquear rollout em caso de falha).', pri: 'medium' }
+        ],
+        [
+          { text: 'Implementar comparação automática de métricas pré e pós-deploy com gate de rollback.', pri: 'high' },
+          { text: 'Ampliar suite de verificação para cobrir performance e integrações externas.', pri: 'medium' },
+          { text: 'Adotar progressive delivery (canary analysis) integrado à verificação automática.', pri: 'medium' }
+        ]
+      ]
+    },
+    {
+      id: 'cd-monitor', label: 'Monitor', section: 'Continuous Deployment',
+      levels: [
+        'Monitoramento ausente ou apenas de disponibilidade; incidentes descobertos pelos usuários.',
+        'Monitoramento básico de infra; logs centralizados; alertas de disponibilidade; on-call informal.',
+        'Métricas de aplicação monitoradas; dashboards por serviço; SLOs definidos; on-call formal com runbooks.',
+        'Observabilidade completa (métricas, logs, traces); MTTR < 30 min; detecção proativa de anomalias.',
+        'AIOps e detecção preditiva; correlação automática de incidentes; cultura de SRE estabelecida.'
+      ],
+      proposals: [
+        [
+          { text: 'Centralizar logs de todos os serviços em uma plataforma unificada (ELK, Loki, CloudWatch).', pri: 'high' },
+          { text: 'Configurar monitoramento de CPU, memória, disco e disponibilidade dos servidores principais.', pri: 'high' },
+          { text: 'Definir on-call informal com escalonamento básico para incidentes críticos.', pri: 'medium' }
+        ],
+        [
+          { text: 'Instrumentar aplicação com métricas de negócio (latência, taxa de erros, throughput).', pri: 'high' },
+          { text: 'Criar dashboards por serviço e torná-los visíveis para toda a equipe.', pri: 'medium' },
+          { text: 'Documentar runbooks para os 10 alertas mais frequentes e treinar o time de on-call.', pri: 'high' }
+        ],
+        [
+          { text: 'Implementar os 3 pilares de observabilidade: métricas, logs e tracing distribuído correlacionados.', pri: 'high' },
+          { text: 'Definir SLOs por serviço e configurar alertas baseados em error budget.', pri: 'high' },
+          { text: 'Reduzir MTTR para menos de 30 minutos através de automação de diagnóstico.', pri: 'medium' }
+        ]
+      ]
+    },
+    {
+      id: 'cd-respond', label: 'Respond', section: 'Continuous Deployment',
+      levels: [
+        'Resposta reativa e desorganizada; sem processo formal; sem pós-mortem.',
+        'Processo básico documentado; responsáveis on-call definidos; pós-mortem para incidentes maiores.',
+        'Severidade categorizada (P1–P4); SLAs de resposta definidos; pós-mortem blameless para P1/P2.',
+        'Runbooks automatizados; MTTR reduzido; game days regulares; análise de causa raiz no backlog.',
+        'Auto-remediação; chaos engineering; cultura de aprendizado; compartilhamento público de aprendizados.'
+      ],
+      proposals: [
+        [
+          { text: 'Documentar e divulgar o processo básico de resposta a incidentes (quem acionar, como comunicar).', pri: 'high' },
+          { text: 'Definir escala de on-call formal com contatos e responsabilidades claras.', pri: 'high' },
+          { text: 'Iniciar prática de pós-mortem para incidentes de alta severidade (P1).', pri: 'medium' }
+        ],
+        [
+          { text: 'Implementar sistema de gestão de incidentes com categorização de severidade (P1–P4) e SLAs.', pri: 'high' },
+          { text: 'Criar status page (interna ou pública) para comunicação de incidentes em tempo real.', pri: 'medium' },
+          { text: 'Realizar pós-mortem blameless para todos os incidentes P1 e P2 com ações de follow-up.', pri: 'high' }
+        ],
+        [
+          { text: 'Automatizar diagnóstico e resolução dos incidentes mais comuns via runbooks executáveis.', pri: 'high' },
+          { text: 'Realizar game days trimestrais para testar resposta a falhas simuladas.', pri: 'medium' },
+          { text: 'Integrar ações de follow-up de pós-mortem ao backlog com prioridade visível.', pri: 'medium' }
+        ]
+      ]
+    },
+    {
+      id: 'cd-observability', label: 'Observability', section: 'Continuous Deployment',
+      levels: [
+        'Sem instrumentação; diagnóstico depende de acesso ao servidor; logs não estruturados.',
+        'Logs centralizados; métricas básicas coletadas; algum tracing manual; APM básico.',
+        'Três pilares implementados; correlação possível via trace ID; dashboards padronizados; SLIs instrumentados.',
+        'Observabilidade como código; tracing distribuído completo; profiling em produção.',
+        'Observabilidade shift-left; RUM integrado; análise de negócio derivada de dados de observabilidade.'
+      ],
+      proposals: [
+        [
+          { text: 'Implementar logs estruturados (JSON) e centralizá-los em uma plataforma de busca.', pri: 'high' },
+          { text: 'Adicionar uma ferramenta de APM (Datadog, New Relic, Dynatrace) para rastreamento básico.', pri: 'high' },
+          { text: 'Instrumentar os endpoints críticos com métricas de latência e taxa de erros.', pri: 'medium' }
+        ],
+        [
+          { text: 'Implementar tracing distribuído (OpenTelemetry) correlacionando logs, métricas e traces por trace ID.', pri: 'high' },
+          { text: 'Padronizar dashboards de serviço incluindo os SLIs definidos.', pri: 'medium' },
+          { text: 'Criar SLIs para cada serviço crítico e instrumentá-los diretamente no código.', pri: 'high' }
+        ],
+        [
+          { text: 'Definir observabilidade como código — instrumentação versionada junto com o serviço.', pri: 'high' },
+          { text: 'Implementar tracing completo end-to-end cobrindo 100% das chamadas entre serviços.', pri: 'medium' },
+          { text: 'Habilitar profiling contínuo em produção para identificar gargalos de performance.', pri: 'medium' }
+        ]
+      ]
+    },
+    {
+      id: 'rod-release', label: 'Release', section: 'Release on Demand',
+      levels: [
+        'Releases raros, planejados com meses de antecedência; big-bang deployments de alto risco.',
+        'Releases por sprint; feature flags básicos; processo de aprovação formal; notas de release.',
+        'Releases desacoplados de deploys via feature toggles; ativação por % de usuários; rollback instantâneo.',
+        'Release on demand real: ativação/desativação sem novo deploy; releases orientados por dados.',
+        'Releases personalizados por segmento; A/B testing integrado; decisões por métricas em tempo real.'
+      ],
+      proposals: [
+        [
+          { text: 'Implementar feature flags básicos para desacoplar o deploy do release de funcionalidades.', pri: 'high' },
+          { text: 'Reduzir o escopo dos releases para ciclos menores (sprint ou quinzenal).', pri: 'high' },
+          { text: 'Documentar e executar processo formal de aprovação e notas de release.', pri: 'medium' }
+        ],
+        [
+          { text: 'Expandir uso de feature flags para que qualquer funcionalidade possa ser ativada/desativada em produção.', pri: 'high' },
+          { text: 'Implementar ativação gradual (canary release) para subconjuntos de usuários.', pri: 'medium' },
+          { text: 'Automatizar geração de notas de release a partir de commits/PRs.', pri: 'low' }
+        ],
+        [
+          { text: 'Implementar sistema de gerenciamento de feature flags com ciclo de vida (LaunchDarkly, Unleash, etc.).', pri: 'high' },
+          { text: 'Vincular decisões de release a métricas de uso e negócio coletadas em produção.', pri: 'medium' },
+          { text: 'Definir processo de limpeza de feature flags obsoletos para reduzir débito técnico.', pri: 'low' }
+        ]
+      ]
+    },
+    {
+      id: 'rod-notify', label: 'Notify', section: 'Release on Demand',
+      levels: [
+        'Comunicação informal e reativa; stakeholders descobrem mudanças por acidente.',
+        'E-mails/mensagens de release manuais; status page básica; notificação prévia para releases maiores.',
+        'Release notes automáticos; notificações automáticas por canal; status page em tempo real.',
+        'Notificações segmentadas; changelog automático; comunicação proativa de manutenções planejadas.',
+        'Sistema omnicanal personalizado; relatórios executivos automáticos; feedback integrado ao planejamento.'
+      ],
+      proposals: [
+        [
+          { text: 'Criar canal oficial de comunicação de releases e incidentes (Slack, Teams, e-mail).', pri: 'high' },
+          { text: 'Publicar status page básica (Atlassian Statuspage, Cachet) para incidentes críticos.', pri: 'medium' },
+          { text: 'Notificar stakeholders principais antes de qualquer release de alto impacto.', pri: 'medium' }
+        ],
+        [
+          { text: 'Automatizar envio de release notes para os canais de comunicação após cada deploy.', pri: 'high' },
+          { text: 'Integrar status page à ferramenta de monitoramento para atualização automática.', pri: 'medium' },
+          { text: 'Padronizar template de comunicação de releases para toda a equipe.', pri: 'low' }
+        ],
+        [
+          { text: 'Segmentar notificações por perfil de stakeholder (técnico vs. negócio).', pri: 'medium' },
+          { text: 'Comunicar manutenções planejadas com pelo menos 48 horas de antecedência via múltiplos canais.', pri: 'high' },
+          { text: 'Publicar changelog público ou interno atualizado automaticamente a partir do histórico de commits.', pri: 'low' }
+        ]
+      ]
+    },
+    {
+      id: 'rod-measure', label: 'Measure', section: 'Release on Demand',
+      levels: [
+        'Sem medição de impacto de features em produção; decisões baseadas em opinião.',
+        'Métricas básicas de adoção coletadas; KPIs definidos informalmente; análise manual pós-release.',
+        'Hipóteses definidas antes do desenvolvimento; analytics integrado ao pipeline; OKRs linkados a métricas.',
+        'A/B testing e experimentos controlados; funnel analytics detalhado; decisões de descontinuação baseadas em dados.',
+        'Métricas de negócio em tempo real influenciam decisões de engenharia; ROI calculado automaticamente.'
+      ],
+      proposals: [
+        [
+          { text: 'Instrumentar as principais funcionalidades com eventos de analytics (Google Analytics, Mixpanel, Amplitude).', pri: 'high' },
+          { text: 'Definir KPIs para as 5 funcionalidades mais críticas do produto.', pri: 'high' },
+          { text: 'Realizar análise de adoção mensalmente e compartilhar com o time.', pri: 'medium' }
+        ],
+        [
+          { text: 'Exigir definição de hipótese e métrica de sucesso antes de iniciar desenvolvimento de qualquer feature.', pri: 'high' },
+          { text: 'Linkar OKRs do produto a métricas mensuráveis rastreadas automaticamente.', pri: 'medium' },
+          { text: 'Criar dashboard de produto com métricas por funcionalidade visível para toda a equipe.', pri: 'medium' }
+        ],
+        [
+          { text: 'Implementar plataforma de A/B testing para validação de hipóteses com dados reais.', pri: 'high' },
+          { text: 'Mapear funnel completo de adoção de cada feature e identificar pontos de abandono.', pri: 'medium' },
+          { text: 'Criar processo de revisão e descontinuação de features com baixo uso baseado em dados.', pri: 'medium' }
+        ]
+      ]
+    },
+    {
+      id: 'rod-learn', label: 'Learn', section: 'Release on Demand',
+      levels: [
+        'Sem processo formal de aprendizado; erros são repetidos; sem cultura de experimentação.',
+        'Retrospectivas regulares; itens de ação acompanhados; pós-mortem documentados.',
+        'Ciclo Build-Measure-Learn formalizado; conhecimento compartilhado entre equipes; métricas de melhoria acompanhadas.',
+        'Aprendizado multidisciplinar integrado; InnerSource e documentação viva como prática.',
+        'Organização que aprende continuamente; contribuições externas; cultura de inovação e segurança psicológica.'
+      ],
+      proposals: [
+        [
+          { text: 'Implementar retrospectivas de sprint regulares com formato estruturado e itens de ação registrados.', pri: 'high' },
+          { text: 'Criar base de conhecimento centralizada para documentar aprendizados e decisões técnicas.', pri: 'medium' },
+          { text: 'Acompanhar itens de ação de retrospectivas anteriores em cada reunião.', pri: 'medium' }
+        ],
+        [
+          { text: 'Formalizar o ciclo Build-Measure-Learn como processo padrão de desenvolvimento de funcionalidades.', pri: 'high' },
+          { text: 'Promover sessões de compartilhamento de conhecimento entre equipes (tech talks, guilds).', pri: 'medium' },
+          { text: 'Medir a taxa de conclusão de itens de retrospectiva para verificar melhoria real.', pri: 'low' }
+        ],
+        [
+          { text: 'Integrar aprendizados de produto, engenharia e operações em um ciclo de melhoria unificado.', pri: 'high' },
+          { text: 'Adotar práticas de InnerSource para reutilização e contribuição entre equipes.', pri: 'medium' },
+          { text: 'Manter documentação viva (ADRs, runbooks) versionada junto com o código.', pri: 'medium' }
+        ]
+      ]
+    },
+    {
+      id: 'rod-innovate', label: 'Innovate', section: 'Release on Demand',
+      levels: [
+        'Inovação técnica não estimulada; adoção de novas ferramentas sem avaliação estruturada; débito técnico crescente.',
+        'Hackathons esporádicos; PoCs realizados; algum budget para exploração técnica.',
+        'Tech radar formal; innovation backlog; 20% time para inovação; débito técnico gerenciado.',
+        'Inovação guiada por métricas de fluxo; automação contínua de tarefas repetitivas; platform engineering.',
+        'Cultura de inovação como diferencial; contribuições open source; plataforma avançada reduzindo cognitive load.'
+      ],
+      proposals: [
+        [
+          { text: 'Reservar tempo dedicado à inovação técnica (ex.: 10% do capacity da equipe).', pri: 'medium' },
+          { text: 'Criar processo estruturado para avaliação e adoção de novas tecnologias (PoC + critérios).', pri: 'medium' },
+          { text: 'Inventariar e priorizar débitos técnicos críticos no backlog do produto.', pri: 'high' }
+        ],
+        [
+          { text: 'Implementar tech radar da equipe para categorizar tecnologias (adotar, avaliar, suspender, abandonar).', pri: 'medium' },
+          { text: 'Formalizar innovation backlog com priorização regular.', pri: 'medium' },
+          { text: 'Estabelecer política de endereçamento de débito técnico (ex.: 20% do sprint dedicado).', pri: 'high' }
+        ],
+        [
+          { text: 'Criar equipe ou função de platform engineering para reduzir carga cognitiva dos times de produto.', pri: 'high' },
+          { text: 'Guiar iniciativas de inovação por métricas de melhoria de fluxo (lead time, DORA).', pri: 'medium' },
+          { text: 'Automatizar tarefas repetitivas identificadas nas retrospectivas como gargalos recorrentes.', pri: 'medium' }
+        ]
+      ]
+    },
+    {
+      id: 'rod-decompose', label: 'Decompose', section: 'Release on Demand',
+      levels: [
+        'Features entregues como big-bang; sem decomposição incremental; dependências não gerenciadas.',
+        'Algumas features decompostas em stories; vertical slicing introduzido; dependências mapeadas no PI Planning.',
+        'Decomposição vertical consistente; MVPs e MMFs definidos; dependências gerenciadas proativamente.',
+        'Decomposição orientada por hypothesis-driven development; independência de deploy entre serviços.',
+        'Arquitetura orientada a entregabilidade; strangler fig para modernização; zero dependências bloqueantes.'
+      ],
+      proposals: [
+        [
+          { text: 'Treinar a equipe em técnicas de vertical slicing e quebra de features em stories independentes.', pri: 'high' },
+          { text: 'Mapear e tornar visíveis todas as dependências entre equipes no backlog.', pri: 'medium' },
+          { text: 'Comprometer-se a nunca iniciar uma feature sem antes decompô-la em entregáveis menores.', pri: 'medium' }
+        ],
+        [
+          { text: 'Adotar o conceito de MMF (Minimum Marketable Feature) como padrão de definição de features.', pri: 'high' },
+          { text: 'Implementar PI Planning com foco em reduzir dependências bloqueantes entre equipes.', pri: 'medium' },
+          { text: 'Garantir que cada sprint entregue ao menos um incremento de valor para o usuário.', pri: 'high' }
+        ],
+        [
+          { text: 'Aplicar hypothesis-driven development: cada feature como experimento com hipótese mensurável.', pri: 'high' },
+          { text: 'Evoluir arquitetura para permitir deploy independente entre serviços (desacoplamento via API/eventos).', pri: 'medium' },
+          { text: 'Usar feature flags para liberar partes de features para subgrupos de usuários progressivamente.', pri: 'medium' }
+        ]
+      ]
+    }
+  ];
+
+  // ══════════════════════════════════════════════
+  // GENERATE ANALYSIS
+  // ══════════════════════════════════════════════
+  function generateAnalysis() {
+    const scores = {};
+    ids.forEach(id => {
+      const el = document.querySelector(`[data-id="${id}"]`);
+      const v = parseFloat(el.value);
+      scores[id] = (v >= 1 && v <= 5) ? Math.round(v) : null;
+    });
+
+    const hasAny = Object.values(scores).some(v => v !== null);
+    if (!hasAny) {
+      alert('Preencha ao menos uma pontuação antes de gerar a análise.');
+      return;
+    }
+
+    buildConsolidation(scores);
+    buildAnalysis(scores);
+    buildProposals(scores);
+
+    const section = document.getElementById('analysisSection');
+    section.style.display = 'block';
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ── Pill helper ──
+  function scorePill(v) {
+    if (v === null) return '<span class="score-na">N/A</span>';
+    const map = { 1: ['pill-critical','Crítico (1)'], 2: ['pill-warning','Atenção (2)'], 3: ['pill-moderate','Moderado (3)'], 4: ['pill-ok','Bom (4)'], 5: ['pill-excellent','Excelente (5)'] };
+    return `<span class="pill ${map[v][0]}">${map[v][1]}</span>`;
+  }
+
+  function scoreBarHTML(v) {
+    if (v === null) return '<span class="score-na">—</span>';
+    const pct = (v / 5) * 100;
+    return `<div class="score-bar-wrap">
+      <span class="score-val" style="color:${['','#e05252','#e88730','#d4b800','#4caf50','#1b7fc4'][v]}">${v}</span>
+      <div class="score-bar-bg"><div class="score-bar-fill bar-${v}" style="width:${pct}%"></div></div>
+    </div>`;
+  }
+
+  // ── 1. CONSOLIDATION ──
+  function buildConsolidation(scores) {
+    const sections = [
+      { name: 'Continuous Integration', actIds: ['ci-develop','ci-build','ci-test','ci-stage','ci-reliability'] },
+      { name: 'Continuous Deployment',  actIds: ['cd-deploy','cd-verify','cd-monitor','cd-respond','cd-observability'] },
+      { name: 'Release on Demand',      actIds: ['rod-release','rod-notify','rod-measure','rod-learn','rod-innovate','rod-decompose'] }
+    ];
+
+    let html = '';
+    let globalSum = 0, globalCount = 0;
+
+    sections.forEach(sec => {
+      html += `<tr class="section-sep"><td colspan="5">${sec.name}</td></tr>`;
+      let secSum = 0, secCount = 0;
+
+      sec.actIds.forEach(id => {
+        const act = activities.find(a => a.id === id);
+        const v   = scores[id];
+        const lvl = v !== null ? act.levels[v - 1] : '—';
+        if (v !== null) { secSum += v; secCount++; globalSum += v; globalCount++; }
+        html += `<tr>
+          <td>${sec.name}</td>
+          <td><strong>${act.label}</strong></td>
+          <td style="font-size:10px;color:#444;">${v !== null ? lvl : '<em style="color:#aaa">Não avaliado</em>'}</td>
+          <td>${scoreBarHTML(v)}</td>
+          <td>${scorePill(v)}</td>
+        </tr>`;
+      });
+
+      const secAvg = secCount > 0 ? (secSum / secCount).toFixed(1) : '—';
+      html += `<tr class="avg-row"><td colspan="3" style="text-align:right;padding-right:12px;">Média — ${sec.name}</td><td>${scoreBarHTML(secCount > 0 ? Math.round(secSum/secCount) : null)}</td><td><strong>${secAvg}</strong></td></tr>`;
+    });
+
+    const globalAvg = globalCount > 0 ? (globalSum / globalCount).toFixed(1) : '—';
+    html += `<tr class="avg-row"><td colspan="3" style="text-align:right;padding-right:12px;background:#0e2650 !important;">Média Geral</td><td style="background:#0e2650 !important;">${scoreBarHTML(globalCount > 0 ? Math.round(globalSum/globalCount) : null)}</td><td style="background:#0e2650 !important;font-size:14px;"><strong>${globalAvg}</strong></td></tr>`;
+
+    document.getElementById('consolidationBody').innerHTML = html;
+  }
+
+  // ── 2. ANALYSIS (scores ≤ 3) ──
+  function buildAnalysis(scores) {
+    const issues = activities.filter(a => scores[a.id] !== null && scores[a.id] <= 3);
+    const container = document.getElementById('analysisCards');
+
+    if (issues.length === 0) {
+      container.innerHTML = '<div class="no-issues">✓ Parabéns! Todos os aspectos avaliados atingiram pontuação superior a 3.</div>';
+      return;
+    }
+
+    // Sort: lowest score first
+    issues.sort((a, b) => scores[a.id] - scores[b.id]);
+
+    let html = `<p style="font-size:11px;color:#555;margin-bottom:12px;">
+      Foram identificados <strong>${issues.length}</strong> aspecto(s) com pontuação ≤ 3, indicando oportunidades de melhoria prioritárias.
+    </p>`;
+
+    issues.forEach(act => {
+      const v = scores[act.id];
+      const lvlDesc = act.levels[v - 1];
+      const nextLvl = v < 5 ? act.levels[v] : null;
+      html += `
+        <div class="analysis-card score-${v}">
+          <div class="analysis-card-header">
+            <div class="analysis-card-title">${act.label}</div>
+            <span class="analysis-card-section">${act.section}</span>
+            ${scorePill(v)}
+          </div>
+          <div class="analysis-card-body">
+            <strong>Situação atual (Nível ${v}):</strong> ${lvlDesc}
+            ${nextLvl ? `<br><br><strong>Estado esperado (Nível ${v+1}):</strong> ${nextLvl}` : ''}
+          </div>
+        </div>`;
+    });
+
+    container.innerHTML = html;
+  }
+
+  // ── 3. PROPOSALS ──
+  function buildProposals(scores) {
+    const issues = activities.filter(a => scores[a.id] !== null && scores[a.id] <= 3);
+    const container = document.getElementById('proposalCards');
+
+    if (issues.length === 0) {
+      container.innerHTML = '<div class="no-issues">Nenhuma alternativa de melhoria necessária para os aspectos avaliados.</div>';
+      return;
+    }
+
+    issues.sort((a, b) => scores[a.id] - scores[b.id]);
+
+    const priLabel = { high: ['pri-high','Alta'], medium: ['pri-medium','Média'], low: ['pri-low','Baixa'] };
+
+    let html = '';
+    issues.forEach(act => {
+      const v = scores[act.id];
+      const propList = act.proposals[v - 1] || [];
+      const actions = propList.map(p => {
+        const [cls, lbl] = priLabel[p.pri];
+        return `<li>${p.text} <span class="priority-badge ${cls}">Prioridade ${lbl}</span></li>`;
+      }).join('');
+
+      html += `
+        <div class="proposal-card">
+          <div class="proposal-card-header">
+            <div class="activity-name">${act.label}</div>
+            <span class="section-tag">${act.section}</span>
+            ${scorePill(v)}
+          </div>
+          <div class="proposal-card-body">
+            <div class="proposal-current">
+              <strong>Nível atual (${v}):</strong> ${act.levels[v - 1]}
+            </div>
+            <p style="font-size:11px;font-weight:700;color:#1b3a6b;margin-bottom:6px;">
+              Ações recomendadas para evoluir do Nível ${v} para o Nível ${v < 5 ? v+1 : 5}:
+            </p>
+            <ul class="proposal-actions">${actions}</ul>
+          </div>
+        </div>`;
+    });
+
+    container.innerHTML = html;
+  }
 </script>
 </body>
 </html>
