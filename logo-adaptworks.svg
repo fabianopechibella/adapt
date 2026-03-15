@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 300" width="260" height="300">
+  <!-- ── SYMBOL: stylized leaf / feather spiral ── -->
+  <g fill="#f48120">
+
+    <!--
+      Outer large leaf: starts at the top tip, sweeps broad to the right,
+      curves back through centre creating the main leaf body, then
+      connects to the inner contour.
+    -->
+    <path d="
+      M 130,12
+      C 158,12 192,28 208,62
+      C 224,96 214,136 188,156
+      C 168,170 144,168 132,154
+      C 116,136 120,108 134,94
+      C 142,86 154,86 152,96
+      C 150,108 142,122 148,136
+      C 154,150 172,150 182,136
+      C 194,118 190,86 174,64
+      C 160,46 140,38 122,42
+      C 100,48 88,68 94,90
+      C 78,74 74,52 84,34
+      C 96,14 114,12 130,12
+      Z
+    "/>
+
+    <!--
+      Inner contour (second leaf / lower curl):
+      creates the spiral effect at the base of the symbol.
+    -->
+    <path d="
+      M 132,154
+      C 120,168 108,184 112,204
+      C 116,222 132,232 148,224
+      C 164,216 166,198 158,184
+      C 152,174 138,172 136,182
+      C 134,192 144,196 146,188
+      C 148,180 140,172 132,174
+      C 122,176 116,186 120,196
+    "/>
+
+  </g>
+
+  <!-- ── TEXT: adaptworks ── -->
+  <text
+    x="130" y="270"
+    text-anchor="middle"
+    font-family="'Helvetica Neue', Arial, Helvetica, sans-serif"
+    font-size="40"
+    font-weight="900"
+    letter-spacing="-1"
+    fill="#1a1a1a"
+  >adaptworks</text>
+
+  <!-- ── TEXT: Emphasys Group ── -->
+  <text
+    x="130" y="295"
+    text-anchor="middle"
+    font-family="'Helvetica Neue', Arial, Helvetica, sans-serif"
+    font-size="18"
+    font-weight="400"
+    fill="#f48120"
+  >Emphasys Group</text>
+</svg>
