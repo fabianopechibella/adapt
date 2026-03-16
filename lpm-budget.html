@@ -120,6 +120,7 @@
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button id="share-button" class="btn btn-secondary">Compartilhar sala</button>
+        <button id="consolidado-button" class="btn btn-secondary">Consolidado</button>
         <button id="reset-button" class="btn btn-dark">Reiniciar board</button>
       </div>
     </section>
@@ -235,6 +236,7 @@
       document.getElementById('join-room').value = initial.room;
       document.getElementById('join-button').addEventListener('click', joinRoom);
       document.getElementById('share-button').addEventListener('click', shareLink);
+      document.getElementById('consolidado-button').addEventListener('click', showConsolidado);
       document.getElementById('reset-button').addEventListener('click', resetBoard);
       document.getElementById('budget-input').addEventListener('change', (event) => updateBudget(event.target.value));
       ['available-column', 'funded-column'].forEach(id => {
@@ -337,6 +339,39 @@
     async function updateThemeAllocation(themeId, value) { const next = deepClone(state.board); next.strategicThemes = next.strategicThemes.map(theme => theme.id === themeId ? Object.assign({}, theme, { allocation: Number(value) || 0 }) : theme); try { await saveCurrentBoard(next); } catch (error) { showError('Falha ao atualizar alocação do tema: ' + error.message); } }
     async function resetBoard() { const next = deepClone(DEFAULT_BOARD); next.activity = [{ id: uid('act'), ts: Date.now(), text: (state.name || 'Facilitador') + ' reiniciou o board.' }]; try { await saveCurrentBoard(next); } catch (error) { showError('Falha ao reiniciar o board: ' + error.message); } }
     function shareLink() { const url = window.location.origin + window.location.pathname + '?room=' + encodeURIComponent(state.room); navigator.clipboard.writeText(url).then(() => alert('Link da sala copiado.')).catch(() => window.prompt('Copie o link da sala:', url)); }
+
+    function showConsolidado() {
+      if (!state.board) return;
+      const funded = state.board.epics.filter(e => e.status === 'funded');
+      const invested = funded.reduce((sum, e) => sum + e.cost, 0);
+      const balance = state.board.budget - invested;
+      const themeMap = {};
+      funded.forEach(e => { const t = themeById(e.themeId); const key = t ? t.name : 'Sem tema'; if (!themeMap[key]) themeMap[key] = { color: t ? t.color : PALETTE.cyan, total: 0, epics: [] }; themeMap[key].total += e.cost; themeMap[key].epics.push(e); });
+      let rows = '';
+      Object.entries(themeMap).forEach(([name, data]) => {
+        rows += `<tr><td colspan="3" style="padding:10px 12px 4px;font-weight:800;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:${data.color};">${name}</td></tr>`;
+        data.epics.forEach(e => { rows += `<tr style="border-top:1px solid var(--line);"><td style="padding:8px 12px;">${e.name}</td><td style="padding:8px 12px;color:#64748b;font-size:13px;">${e.description}</td><td style="padding:8px 12px;text-align:right;font-weight:800;white-space:nowrap;">${BRL(e.cost)}</td></tr>`; });
+        rows += `<tr style="border-top:1px solid var(--line);background:#f8fafc;"><td colspan="2" style="padding:6px 12px;font-weight:800;font-size:13px;">Total ${name}</td><td style="padding:6px 12px;text-align:right;font-weight:900;color:${data.color};">${BRL(data.total)}</td></tr>`;
+      });
+      const modal = document.createElement('div');
+      modal.id = 'consolidado-modal';
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,52,70,0.55);display:flex;align-items:center;justify-content:center;z-index:9999;padding:24px;';
+      modal.innerHTML = `<div style="background:#fff;border-radius:32px;box-shadow:0 24px 64px rgba(0,52,70,0.18);max-width:720px;width:100%;max-height:85vh;overflow:auto;padding:32px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
+          <div><div style="text-transform:uppercase;letter-spacing:.18em;font-size:12px;font-weight:700;color:#64748b;">Resultado consolidado</div><h2 style="margin:8px 0 0;font-size:28px;font-weight:900;color:var(--navy);">Sala ${state.room}</h2></div>
+          <button id="close-consolidado" class="btn btn-secondary" style="flex-shrink:0;">Fechar</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
+          <div style="background:#FFF8F1;border-radius:20px;padding:14px;"><div style="font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#94a3b8;">Budget</div><div style="font-size:22px;font-weight:900;color:var(--orange1);margin-top:6px;">${BRL(state.board.budget)}</div></div>
+          <div style="background:#F1FBFB;border-radius:20px;padding:14px;"><div style="font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#94a3b8;">Investido</div><div style="font-size:22px;font-weight:900;color:var(--teal);margin-top:6px;">${BRL(invested)}</div></div>
+          <div style="background:${balance < 0 ? 'var(--dangerBg)' : '#F2FAFD'};border-radius:20px;padding:14px;"><div style="font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#94a3b8;">Saldo</div><div style="font-size:22px;font-weight:900;color:${balance < 0 ? 'var(--orange2)' : 'var(--blueDeep)'};margin-top:6px;">${BRL(balance)}</div></div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">${rows || '<tr><td style="padding:24px;text-align:center;color:#64748b;">Nenhuma iniciativa financiada.</td></tr>'}</table>
+      </div>`;
+      document.body.appendChild(modal);
+      document.getElementById('close-consolidado').addEventListener('click', () => modal.remove());
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    }
 
     function render() {
       if (!state.board) return;
