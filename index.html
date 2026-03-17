@@ -119,12 +119,14 @@
       top: 0; left: 0; right: 0;
       z-index: 100;
       padding: 0 24px;
+      background: rgba(247,250,252,.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
       transition: background var(--transition), box-shadow var(--transition);
     }
     .nav.scrolled {
-      background: rgba(255,255,255,.95);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(255,255,255,.97);
       box-shadow: 0 1px 24px rgba(0,54,70,.08);
     }
     .nav-inner {
@@ -204,7 +206,7 @@
       align-items: center;
       position: relative;
       overflow: hidden;
-      background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 60%, #005a75 100%);
+      background: linear-gradient(135deg, var(--paper) 0%, #ffffff 55%, #eef8fb 100%);
       padding-top: 72px;
     }
     .hero-bg-circle {
@@ -215,14 +217,14 @@
     .hero-bg-circle-1 {
       width: 800px;
       height: 800px;
-      background: radial-gradient(circle, rgba(247,141,42,.18) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(247,141,42,.10) 0%, transparent 70%);
       right: -200px;
       top: -200px;
     }
     .hero-bg-circle-2 {
       width: 500px;
       height: 500px;
-      background: radial-gradient(circle, rgba(27,162,200,.12) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(27,162,200,.08) 0%, transparent 70%);
       left: -100px;
       bottom: -100px;
     }
@@ -236,14 +238,15 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(255,255,255,.1);
-      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.9);
+      border: 1px solid var(--line);
       border-radius: 99px;
       padding: 8px 16px;
       font-size: 13px;
       font-weight: 700;
-      color: rgba(255,255,255,.9);
+      color: var(--navy);
       margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
     }
     .hero-badge-dot {
       width: 8px;
@@ -256,7 +259,7 @@
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: .6; transform: scale(1.3); }
     }
-    .hero h1 { color: var(--white); margin-bottom: 24px; }
+    .hero h1 { color: var(--navy); margin-bottom: 24px; }
     .hero h1 em {
       font-style: normal;
       background: linear-gradient(90deg, var(--orange), var(--amber));
@@ -264,24 +267,24 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .hero-text { color: rgba(255,255,255,.75); font-size: 18px; margin-bottom: 40px; max-width: 520px; }
+    .hero-text { color: var(--muted); font-size: 18px; margin-bottom: 40px; max-width: 520px; }
     .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
     .hero-stats {
       display: flex;
       gap: 32px;
       margin-top: 56px;
       padding-top: 40px;
-      border-top: 1px solid rgba(255,255,255,.12);
+      border-top: 1px solid var(--line);
     }
     .hero-stat-value {
       font-size: 36px;
       font-weight: 900;
-      color: var(--white);
+      color: var(--navy);
       line-height: 1;
     }
     .hero-stat-label {
       font-size: 13px;
-      color: rgba(255,255,255,.6);
+      color: var(--muted);
       margin-top: 4px;
       font-weight: 500;
     }
@@ -308,8 +311,8 @@
       justify-content: center;
     }
     .partner-badge {
-      background: rgba(255,255,255,.1);
-      border: 1px solid rgba(255,255,255,.2);
+      background: var(--white);
+      border: 1px solid var(--line);
       border-radius: var(--radius);
       padding: 10px 14px;
       display: flex;
@@ -317,7 +320,8 @@
       gap: 8px;
       font-size: 12px;
       font-weight: 700;
-      color: rgba(255,255,255,.85);
+      color: var(--navy);
+      box-shadow: var(--shadow-sm);
     }
     .badge-dot-gold {
       width: 10px; height: 10px; border-radius: 50%;
@@ -889,7 +893,7 @@
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L15 8L8 15M15 8H1" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
               Ver Treinamentos
             </a>
-            <a href="#consultoria" class="btn btn-white">Consultoria</a>
+            <a href="#consultoria" class="btn btn-outline">Consultoria</a>
           </div>
           <div class="hero-stats">
             <div>
@@ -916,11 +920,11 @@
                   <stop offset="100%" stop-color="#F7941E"/>
                 </radialGradient>
                 <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stop-color="rgba(255,255,255,0.06)"/>
-                  <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+                  <stop offset="0%" stop-color="rgba(247,141,42,0.08)"/>
+                  <stop offset="100%" stop-color="rgba(247,141,42,0)"/>
                 </radialGradient>
               </defs>
-              <circle cx="170" cy="170" r="160" fill="url(#bgGrad)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+              <circle cx="170" cy="170" r="160" fill="url(#bgGrad)" stroke="rgba(247,141,42,0.12)" stroke-width="1"/>
               <!-- Spiral path mimicking the Adaptworks swoosh logo -->
               <path d="M 220 80
                 C 280 80, 310 130, 300 190
@@ -940,7 +944,7 @@
                 C 200 125, 215 150, 205 170
                 C 195 190, 175 195, 162 185
                 C 149 175, 152 158, 162 155"
-                stroke="rgba(255,255,255,0.25)" stroke-width="8" stroke-linecap="round" fill="none"/>
+                stroke="rgba(255,255,255,0.5)" stroke-width="8" stroke-linecap="round" fill="none"/>
             </svg>
           </div>
           <div class="hero-badges-row">
