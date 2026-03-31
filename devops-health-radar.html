@@ -530,6 +530,53 @@
     .no-issues  { text-align: center; padding: 24px; color: var(--teal); font-weight: 800; font-size: 14px; }
     .hint-text  { text-align: center; padding: 20px; color: #94a3b8; font-style: italic; font-size: 12px; }
 
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      body { font-size: 13px; }
+      .page { padding: 12px; gap: 12px; }
+
+      /* Header */
+      .header { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 16px; }
+      .header-logo img { height: 44px; }
+      .header-right { text-align: left; }
+      .header-title { font-size: 18px; }
+
+      /* Top area: stack vertically */
+      .top-area { grid-template-columns: 1fr; }
+      .radar-wrap canvas { max-width: 220px; max-height: 220px; }
+
+      /* Assessment table: horizontal scroll */
+      .assessment-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .assessment-table { font-size: 11px; min-width: 640px; }
+      .col-aspecto   { width: 72px; }
+      .col-atividade { width: 110px; }
+      .col-complement { width: 110px; }
+      .col-pontuacao { width: 60px; }
+      .col-comments  { width: 100px; }
+
+      /* Meta fields */
+      .meta-fields { flex-direction: column; gap: 14px; padding: 14px 16px; }
+      .meta-field-group.narrow { flex: 1 1 100%; }
+
+      /* Instructions */
+      .instructions { font-size: 12px; padding: 14px 16px; }
+      .instructions h3 { font-size: 12px; }
+      .maturity-table { font-size: 11px; }
+
+      /* Analysis */
+      .analysis-section { padding: 14px 16px; }
+
+      /* Buttons */
+      .footer { gap: 10px; }
+      .btn { font-size: 14px; padding: 13px 20px; width: 100%; text-align: center; }
+
+      /* Score inputs */
+      .score-input { width: 44px; height: 34px; font-size: 14px; }
+
+      /* Card radius smaller on mobile */
+      .card { border-radius: 16px; }
+    }
+
     @media print {
       body { font-size: 9px; background: #fff; }
       .page { padding: 10px; gap: 10px; }
@@ -548,7 +595,7 @@
   <!-- ── HEADER ── -->
   <div class="header card">
     <div class="header-logo">
-      <img src="adapt_original_horizontal.png" alt="adaptworks – Emphasys Group">
+      <img src="logo-adaptworks.svg" alt="adaptworks – Emphasys Group">
     </div>
     <div class="header-right">
       <div class="eyebrow">Avaliação de Maturidade</div>
