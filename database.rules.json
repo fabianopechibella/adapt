@@ -1,0 +1,18 @@
+{
+  "rules": {
+    "rooms": {
+      "$roomId": {
+        ".read": true,
+        ".write": true,
+        "boardState": {
+          ".validate": "newData.hasChildren(['budget', 'epics', 'strategicThemes', 'revision'])"
+        },
+        "presence": {
+          "$sessionId": {
+            ".validate": "newData.hasChildren(['name', 'color', 'online_at'])"
+          }
+        }
+      }
+    }
+  }
+}

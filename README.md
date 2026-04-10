@@ -166,9 +166,21 @@ Compartilhe essa URL com os participantes.
 
 ---
 
-## Regras de segurança recomendadas
+## Regras de segurança do Realtime Database
 
-Para workshops internos o modo de teste é suficiente. Se precisar de mais controle, acesse **Realtime Database → Regras** e substitua pelo seguinte:
+> **Atenção:** O modo de teste do Firebase expira automaticamente após 30 dias. Após a expiração, o banco de dados bloqueia todas as leituras e gravações e o aplicativo para de funcionar. Aplique as regras abaixo antes que isso ocorra.
+
+### Opção 1 — Firebase CLI (recomendado)
+
+O arquivo `database.rules.json` na raiz do projeto já contém as regras corretas. Para publicá-las execute:
+
+```bash
+firebase deploy --only database
+```
+
+### Opção 2 — Firebase Console (manual)
+
+Acesse **Realtime Database → Regras** no [Firebase Console](https://console.firebase.google.com) e substitua o conteúdo por:
 
 ```json
 {
@@ -190,6 +202,17 @@ Para workshops internos o modo de teste é suficiente. Se precisar de mais contr
   }
 }
 ```
+
+### Por que essas regras são mais seguras que o modo de teste
+
+| Aspecto | Modo de teste | Regras acima |
+|---|---|---|
+| Acesso à raiz do banco | Qualquer um lê/escreve tudo | Bloqueado |
+| Acesso a `rooms/` | Qualquer um lê/escreve tudo | Leitura e escrita abertas (necessário sem autenticação) |
+| Validação de estrutura | Nenhuma | `boardState` e `presence` validados |
+| Expiração | 30 dias | Sem expiração |
+
+Como o aplicativo não usa Firebase Authentication, não é possível restringir o acesso por usuário. As regras acima garantem que apenas caminhos válidos do schema (`rooms/$roomId/boardState` e `rooms/$roomId/presence/$sessionId`) aceitem dados com a estrutura correta, impedindo gravações arbitrárias fora desses caminhos.
 
 ---
 
