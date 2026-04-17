@@ -1,0 +1,146 @@
+====================================================
+  SISTEMA DE PESQUISA AUTOMATICA — ESAJ TJSP
+  Versao 1.0 | Abril 2026
+====================================================
+
+REQUISITOS
+----------
+- Windows 10 ou superior
+- Microsoft Edge instalado
+- Conexao com a internet
+- Python 3.9 ou superior (instalado pelo setup.bat)
+
+
+ESTRUTURA DA PASTA AUTOMACAO
+-----------------------------
+Coloque TODOS os arquivos abaixo na mesma pasta:
+
+  LEIA-ME.txt                          -> Este arquivo
+  setup.bat                            -> Configuracao inicial (execute 1 vez)
+  START_EDGE-MANUAL_LOGIN.bat          -> Abre o Edge no ESAJ para login
+  RUM_ESAJ.bat                         -> Executa a pesquisa automatica
+  criar_planilhas.bat                  -> Recria as planilhas modelo
+  esaj_pesquisa.py                     -> Motor da automacao (nao editar)
+  criar_planilhas.py                   -> Cria planilhas modelo (nao editar)
+  requirements.txt                     -> Dependencias Python (nao editar)
+
+  CONSULTA PROCESSOS 2026 - COPIA.xlsx -> Planilha de ENTRADA (voce preenche)
+  RESULTADOS_CONSULTA.xlsx             -> Planilha de SAIDA  (gerada automaticamente)
+
+NOTA: A planilha "PROCESSOS MISTO" nao vai para a pasta AUTOMACAO.
+      Ela e usada apenas para copiar os numeros de processo.
+
+
+====================================================
+PASSO A PASSO COMPLETO
+====================================================
+
+--- CONFIGURACAO INICIAL (fazer apenas uma vez) ---
+
+1. Coloque todos os arquivos na pasta AUTOMACAO na Area de Trabalho.
+
+2. Clique 2x em "setup.bat"
+   - O Python e as dependencias serao instalados automaticamente.
+   - As planilhas modelo serao criadas.
+   - Aguarde a conclusao e pressione Enter.
+
+
+--- USO DIARIO ---
+
+PASSO 1 — Preparar a lista de processos
+   a. Abra a planilha "PROCESSOS MISTO"
+   b. Selecione os numeros de processo desejados e COPIE (Ctrl+C)
+   c. Abra "CONSULTA PROCESSOS 2026 - COPIA.xlsx"
+   d. Cole os numeros na coluna A (a partir da linha 3)
+   e. Salve e feche o arquivo (Ctrl+S)
+
+PASSO 2 — Abrir o Edge e fazer login no ESAJ
+   a. Clique 2x em "START_EDGE-MANUAL_LOGIN.bat"
+   b. Clique em EXECUTAR se o Windows pedir confirmacao
+   c. O Edge abrira automaticamente no site do ESAJ
+   d. Clique em "Identificar-se" e faca o login normalmente
+   e. Apos logado, MINIMIZE o Edge (nao feche!)
+   f. A janela preta pode ser fechada
+
+PASSO 3 — Executar a pesquisa automatica
+   a. Clique 2x em "RUM_ESAJ.bat"
+   b. Clique em EXECUTAR se o Windows pedir confirmacao
+   c. Uma tela preta abrira e mostrara o progresso
+   d. O programa pesquisara processo por processo sozinho
+   e. Voce pode usar o computador normalmente enquanto aguarda
+   f. Ao terminar, a tela informara que concluiu
+   g. Pressione Enter (ou qualquer tecla) para fechar
+
+PASSO 4 — Ver os resultados
+   a. Abra a pasta AUTOMACAO
+   b. Abra "RESULTADOS_CONSULTA.xlsx"
+   c. Todos os resultados estarao organizados na planilha
+
+
+====================================================
+DADOS EXTRAIDOS POR PROCESSO
+====================================================
+
+  - Numero do Processo
+  - Classe (tipo de acao)
+  - Assunto
+  - Foro
+  - Vara
+  - Juiz / Juiza
+  - Valor da Acao
+  - Situacao (Ex: Em andamento, Arquivado, Sentenciado)
+  - Parte Autora / Requerente
+  - Parte Re / Requerida
+  - Ultimo Andamento (descricao)
+  - Data do Ultimo Andamento
+  - Status da Pesquisa (Encontrado / Nao encontrado / Erro)
+
+
+====================================================
+CORES NA PLANILHA DE RESULTADOS
+====================================================
+
+  VERDE   = Processo encontrado com sucesso
+  AMARELO = Processo nao encontrado no ESAJ
+  VERMELHO = Erro durante a pesquisa (verifique o numero)
+
+
+====================================================
+SOLUCAO DE PROBLEMAS
+====================================================
+
+PROBLEMA: "Python nao encontrado"
+SOLUCAO:  Execute setup.bat e aguarde a instalacao completa.
+          Se persistir, baixe o Python em python.org e marque
+          "Add Python to PATH" durante a instalacao.
+
+PROBLEMA: "Erro ao conectar ao Edge"
+SOLUCAO:  Certifique-se de ter executado START_EDGE-MANUAL_LOGIN.bat
+          ANTES de executar RUM_ESAJ.bat. Nao abra o Edge manualmente.
+
+PROBLEMA: Edge abre mas nao vai para o ESAJ
+SOLUCAO:  Aguarde alguns segundos. Se necessario, acesse manualmente:
+          https://esaj.tjsp.jus.br/sajcas/login
+
+PROBLEMA: Todos os processos retornam "Nao encontrado"
+SOLUCAO:  Verifique se o login foi feito corretamente no ESAJ.
+          Alguns processos podem ter acesso restrito.
+
+PROBLEMA: Numero do processo com formato errado
+SOLUCAO:  Use o formato CNJ padrao:
+          NNNNNNN-DD.AAAA.8.26.OOOO
+          Exemplo: 1001234-56.2023.8.26.0100
+
+PROBLEMA: Windows bloqueou o arquivo .bat
+SOLUCAO:  Clique com botao direito > Propriedades > marque
+          "Desbloquear" na parte inferior da janela.
+
+
+====================================================
+SUPORTE TECNICO
+====================================================
+
+Em caso de duvidas ou erros nao listados acima,
+entre em contato com o responsavel pelo sistema.
+
+====================================================
