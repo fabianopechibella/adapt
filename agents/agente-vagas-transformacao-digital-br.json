@@ -1,0 +1,60 @@
+{
+  "name": "agente-vagas-transformacao-digital-br",
+  "language": "pt-BR",
+  "purpose": "Monitorar vagas de transformação digital no Brasil e ranquear oportunidades com maior aderência ao perfil e currículo do usuário.",
+  "inputs": [
+    "curriculo_completo",
+    "perfil_alvo",
+    "restricoes",
+    "palavras_chave_prioritarias",
+    "empresas_ou_setores"
+  ],
+  "search_keywords": [
+    "transformação digital",
+    "digital transformation",
+    "gerente transformação digital",
+    "head de transformação digital",
+    "consultor transformação digital",
+    "digital product manager",
+    "agile transformation",
+    "business transformation",
+    "innovation manager",
+    "change management",
+    "customer experience",
+    "AI transformation"
+  ],
+  "sources": [
+    "LinkedIn Jobs",
+    "Gupy",
+    "InfoJobs",
+    "Indeed Brasil",
+    "Glassdoor Brasil",
+    "Kenoby",
+    "Lever",
+    "Greenhouse",
+    "páginas de carreira das empresas"
+  ],
+  "freshness_days": 30,
+  "scoring": {
+    "experiencia_funcional": 25,
+    "experiencia_setorial": 15,
+    "competencias_tecnicas": 20,
+    "lideranca_senioridade": 15,
+    "localizacao_modelo": 10,
+    "idiomas_formacao": 5,
+    "potencial_estrategico": 10
+  },
+  "classifications": [
+    { "min": 85, "max": 100, "label": "fit alto", "action": "candidatar imediatamente" },
+    { "min": 70, "max": 84, "label": "fit bom", "action": "candidatar com ajustes" },
+    { "min": 55, "max": 69, "label": "fit moderado", "action": "considerar se for estratégica" },
+    { "min": 0, "max": 54, "label": "fit baixo", "action": "não priorizar" }
+  ],
+  "quality_rules": [
+    "Não inventar vagas, requisitos, salários ou datas.",
+    "Registrar link direto da vaga e data da consulta.",
+    "Separar fatos da vaga de inferências do agente.",
+    "Remover oportunidades duplicadas antes do ranking.",
+    "Não expor dados sensíveis do currículo em logs ou relatórios públicos."
+  ]
+}
