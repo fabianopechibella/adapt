@@ -98,3 +98,19 @@ Pergunta do usuário:
 Contexto adicional (opcional):
 <área/departamento, urgência, fonte sugerida, etc.>
 ```
+
+## Implantação e testes (Microsoft Copilot Studio + Teams)
+
+Caminho recomendado quando a base de conhecimento está no SharePoint e o canal de acesso é o Microsoft Teams:
+
+1. **Criar o agente**: em [Copilot Studio](https://copilotstudio.microsoft.com), *Create* → *New agent* → configuração manual.
+2. **Instruções**: colar neste agente o conteúdo das seções "Papel do agente", "Regras de qualidade" e "Formato de resposta esperado" acima no campo *Instructions* (respeitando o limite de caracteres do campo).
+3. **Base de conhecimento**: *Add knowledge* → *SharePoint* → informar a URL do site/biblioteca/lista. Múltiplos sites podem ser adicionados.
+   - Confluence e Notion **não são conectores nativos** do Copilot Studio; exigem conector customizado via Power Platform/Power Automate.
+4. **Autenticação**: manter *Authenticate with Microsoft* (padrão) para que as permissões de acesso do SharePoint sejam respeitadas por usuário.
+5. **Testar antes de publicar**: usar o painel de teste do próprio Copilot Studio com perguntas reais, validando citação de fonte, recusa a inventar respostas quando não há informação, e respeito às permissões de acesso.
+6. **Publicar**: *Publish* → *Channels* → *Teams + Microsoft 365*.
+7. **Limitação conhecida**: fontes SharePoint que exigem autenticação do usuário só funcionam em **chat 1:1** com o agente no Teams (não em canais/grupos) — limitação por design da Microsoft para evitar vazamento de dados entre usuários com permissões diferentes.
+8. **Teste final**: repetir as perguntas de validação em conversa real 1:1 com o agente no Teams.
+
+Alternativa com mais controle (fora do ecossistema Copilot Studio): construir um bot próprio no Azure Bot Framework que busca no SharePoint via Microsoft Graph API, monta o contexto e chama a API da Claude usando este arquivo como system prompt, testável localmente com o Bot Framework Emulator antes de publicar como app do Teams.
