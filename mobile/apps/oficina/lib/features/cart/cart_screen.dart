@@ -99,7 +99,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   children: [
                     Row(
                       children: [
-                        Expanded(child: Text('${cart.itemCount} itens · até ~${cart.etaMinutes} min')),
+                        Expanded(
+                          child: Text(
+                            '${cart.itemCount} ${cart.itemCount == 1 ? 'item' : 'itens'} · até ~${cart.etaMinutes} min',
+                          ),
+                        ),
                         Text(cart.total.format(), style: theme.textTheme.titleLarge),
                       ],
                     ),

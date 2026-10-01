@@ -66,6 +66,22 @@ dart format --set-exit-if-changed packages apps
 O workflow `.github/workflows/mobile.yml` roda formato, análise e testes, e depois compila o
 APK (Ubuntu) e o app de simulador iOS (macOS) de cada app.
 
+## Emulador Android e simulador iOS
+
+Cada app tem um teste de integração (`integration_test/demo_flow_test.dart`) que percorre o
+modo demonstração e tira uma captura de cada tela:
+
+```bash
+cd apps/oficina   # ou apps/entregador
+flutter drive --driver=test_driver/integration_test.dart \
+  --target=integration_test/demo_flow_test.dart -d <id do emulador ou simulador>
+# capturas em ./screenshots/
+```
+
+O workflow `.github/workflows/mobile-emulators.yml` faz isso em um emulador Pixel 7 com
+Android 14 e em um simulador de iPhone, e publica as capturas como artefatos
+(`<app>-android-screenshots` e `<app>-ios-screenshots`).
+
 ## Antes de ir para produção
 
 - Persistir a sessão em armazenamento seguro (Keychain/Keystore) e renovar o token.

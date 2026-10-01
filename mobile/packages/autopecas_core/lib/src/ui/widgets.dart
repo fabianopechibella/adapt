@@ -116,7 +116,8 @@ class ErrorView extends StatelessWidget {
   );
 }
 
-/// Faixa que deixa claro quando o app está rodando com dados de demonstração.
+/// Faixa no topo que deixa claro quando o app roda com dados de demonstração.
+/// Fica acima do conteúdo (e não sobre ele) para não cobrir ações da AppBar.
 class DemoBanner extends StatelessWidget {
   const DemoBanner({super.key, required this.enabled, required this.child});
 
@@ -124,8 +125,32 @@ class DemoBanner extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) =>
-      enabled ? Banner(message: 'DEMO', location: BannerLocation.topEnd, color: Tokens.accent, child: child) : child;
+  Widget build(BuildContext context) {
+    if (!enabled) return child;
+    return Column(
+      children: [
+        Material(
+          color: Tokens.accent,
+          child: SafeArea(
+            bottom: false,
+            child: SizedBox(
+              width: double.infinity,
+              height: 22,
+              child: Center(
+                child: Text(
+                  'MODO DEMONSTRAÇÃO · dados fictícios',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.white, letterSpacing: 0.6),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: MediaQuery.removePadding(context: context, removeTop: true, child: child),
+        ),
+      ],
+    );
+  }
 }
 
 void showError(BuildContext context, Object error) {

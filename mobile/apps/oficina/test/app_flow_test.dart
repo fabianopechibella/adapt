@@ -82,6 +82,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Carrinho'), findsOneWidget);
+    expect(find.textContaining('1 item ·'), findsOneWidget);
     await tester.tap(find.byKey(const Key('checkout')));
     await tester.pumpAndSettle();
 
