@@ -85,6 +85,22 @@ flutter build web --release --base-href /oficina/ \
 - O CI publica o build como artefato `oficina-web`.
 - O app do entregador não tem versão web: depende de GPS em segundo plano e câmera.
 
+## Pacote para rodar localmente
+
+Para quem não tem Flutter instalado: um `.zip` com o app da Oficina (web, modo
+demonstração), iniciadores para Windows, macOS e Linux e, no CI, os APKs de teste.
+
+```bash
+scripts/empacotar.sh [pasta-com-apks]   # gera dist/autopecas-local-<versão>.zip
+```
+
+- O iniciador é um servidor estático em Go (`tools/servidor_local`), sem dependências: serve
+  a pasta `web/` em `127.0.0.1` e abre o navegador. Com `--rede`, aceita conexões do celular no
+  mesmo Wi-Fi.
+- Os executáveis não são assinados: o Windows (SmartScreen) e o macOS (Gatekeeper) pedem
+  confirmação na primeira vez. O `LEIA-ME.txt` do pacote explica o passo a passo.
+- O CI publica o pacote completo, com os APKs, como artefato `autopecas-pacote-local`.
+
 ## Emulador Android e simulador iOS
 
 Cada app tem um teste de integração (`integration_test/demo_flow_test.dart`) que percorre o

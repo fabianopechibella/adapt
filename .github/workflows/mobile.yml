@@ -109,3 +109,39 @@ jobs:
           name: oficina-web
           path: mobile/apps/oficina/build/web/
           retention-days: 14
+
+  pacote:
+    name: Pacote para rodar localmente
+    needs: [android, web]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: mobile/tools/servidor_local/go.mod
+      - name: Testes do servidor local
+        working-directory: mobile/tools/servidor_local
+        run: go vet ./... && go test ./...
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: '*-android-debug'
+          path: /tmp/apks-ci
+      - name: Renomear APKs
+        run: |
+          mkdir -p /tmp/apks
+          for app in oficina entregador; do
+            cp "/tmp/apks-ci/$app-android-debug/app-debug.apk" "/tmp/apks/autopecas-$app.apk"
+          done
+      - name: Montar pacote
+        run: scripts/empacotar.sh /tmp/apks
+      - uses: actions/upload-artifact@v4
+        with:
+          name: autopecas-pacote-local
+          path: mobile/dist/*.zip
+          retention-days: 14

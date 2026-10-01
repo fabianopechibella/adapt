@@ -1,0 +1,41 @@
+AUTOPEÇAS · PACOTE PARA RODAR LOCALMENTE (MODO DEMONSTRAÇÃO)
+=============================================================
+
+Este pacote roda o app da Oficina no seu navegador, sem instalar nada.
+Todos os dados são fictícios e ficam só na memória do navegador.
+
+COMO ABRIR
+----------
+Windows ...... duplo clique em "iniciar-windows.exe".
+               Se aparecer "O Windows protegeu o computador": Mais informações > Executar assim mesmo.
+macOS ........ clique com o botão direito em "iniciar-mac.command" > Abrir > Abrir.
+               (na primeira vez o macOS pede essa confirmação porque o arquivo não é assinado)
+Linux ........ no terminal: ./iniciar-linux.sh
+
+O navegador abre em http://127.0.0.1:8080 (ou na próxima porta livre).
+Para encerrar, feche a janela do terminal.
+
+DADOS PARA TESTAR
+-----------------
+CNPJ ............ 11.222.333/0001-81   (qualquer celular)
+Código .......... 123456
+Placas .......... ABC1D23 (Onix) · BRA2E19 (HB20) · QWE4R56 (Strada) · KJH5544 (Gol)
+Experimente ..... buscar "embreagem" no Onix; "velas" no Onix mostra o bloqueio de
+                  aplicação não confirmada; no Assistente, "pastilha de freio do HB20 BRA2E19".
+O pedido avança sozinho a cada 4 segundos; a NF-e de "Auto Norte" é rejeitada uma vez
+e reemitida, para mostrar a compensação.
+
+NO CELULAR (MESMA REDE WI-FI)
+-----------------------------
+Windows: duplo clique em "iniciar-celular-mesma-rede.bat".
+macOS/Linux: rode o iniciador com --rede (ex.: ./iniciar-linux.sh --rede).
+O terminal mostra o endereço para digitar no celular (ex.: http://192.168.0.10:8080).
+O firewall pode pedir permissão na primeira vez.
+
+APPS NATIVOS
+------------
+Pasta "android" (quando presente): APKs de teste da Oficina e do Entregador.
+No Android, abra o arquivo .apk e permita "instalar apps desconhecidos".
+iPhone: o app nativo exige conta Apple Developer para instalar; use a versão web acima.
+
+Requisitos: Chrome, Edge, Safari ou Firefox atualizados.
