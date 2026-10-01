@@ -1,0 +1,324 @@
+openapi: 3.1.0
+info:
+  title: Marketplace de Autopeças · BFFs mobile
+  version: 0.1.0
+  description: |
+    Contrato entre os apps (Oficina e Entregador) e seus BFFs. Os modelos espelham
+    `packages/autopecas_core/lib/src/domain`. Valores monetários sempre em centavos.
+    Erros retornam `{ "code": "...", "message": "..." }` com mensagem pronta para exibir.
+servers:
+  - url: https://bff-oficina.exemplo.com.br
+    description: BFF da oficina
+  - url: https://bff-entregador.exemplo.com.br
+    description: BFF do entregador
+security:
+  - bearer: []
+
+paths:
+  /v1/auth/otp:
+    post:
+      summary: Envia código de acesso por SMS/WhatsApp
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [audience, login, phone]
+              properties:
+                audience: { type: string, enum: [workshop, courier] }
+                login: { type: string, description: CNPJ (numérico ou alfanumérico) para oficina, CPF para entregador }
+                phone: { type: string }
+      responses:
+        '204': { description: Código enviado }
+        '422': { $ref: '#/components/responses/Error' }
+  /v1/auth/verify:
+    post:
+      summary: Troca o código por um token de sessão
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [audience, login, code]
+              properties:
+                audience: { type: string, enum: [workshop, courier] }
+                login: { type: string }
+                code: { type: string, minLength: 6, maxLength: 6 }
+      responses:
+        '200': { description: Sessão, content: { application/json: { schema: { $ref: '#/components/schemas/Session' } } } }
+        '401': { $ref: '#/components/responses/Error' }
+
+  /v1/me:
+    get:
+      summary: Conta B2B da oficina
+      responses:
+        '200': { description: Conta, content: { application/json: { schema: { $ref: '#/components/schemas/WorkshopAccount' } } } }
+
+  /v1/vehicles/by-plate/{plate}:
+    get:
+      summary: Placa → veículo normalizado (marca, modelo, ano, motor, FIPE)
+      parameters:
+        - { name: plate, in: path, required: true, schema: { type: string, pattern: '^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$' } }
+      responses:
+        '200': { description: Veículo, content: { application/json: { schema: { $ref: '#/components/schemas/Vehicle' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+  /v1/vehicles/{vehicleId}/compatible-parts:
+    get:
+      summary: Peças com aplicação para o veículo (decidido pelo grafo de fitment)
+      parameters:
+        - { name: vehicleId, in: path, required: true, schema: { type: string } }
+        - { name: q, in: query, required: false, schema: { type: string }, description: Nome, sintoma ou código da peça }
+      responses:
+        '200':
+          description: Ordenado por confiança decrescente
+          content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/FitmentMatch' } } } }
+  /v1/parts/{partId}/offers:
+    get:
+      summary: Ofertas dos distribuidores (preço por cliente, estoque, prazo)
+      parameters:
+        - { name: partId, in: path, required: true, schema: { type: string } }
+        - { name: vehicleId, in: query, required: false, schema: { type: string } }
+      responses:
+        '200': { description: Ofertas, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Offer' } } } } }
+
+  /v1/orders:
+    get:
+      summary: Pedidos da oficina, mais recentes primeiro
+      responses:
+        '200': { description: Pedidos, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Order' } } } } }
+    post:
+      summary: Cria o pedido-mãe e um subpedido (saga) por distribuidor
+      parameters:
+        - { name: Idempotency-Key, in: header, required: true, schema: { type: string }, description: Mesma chave = mesmo pedido }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [paymentMethod, lines]
+              properties:
+                paymentMethod: { $ref: '#/components/schemas/PaymentMethod' }
+                lines:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [offerId, partId, quantity]
+                    properties:
+                      offerId: { type: string }
+                      partId: { type: string }
+                      quantity: { type: integer, minimum: 1 }
+                      vehicleId: { type: string }
+      responses:
+        '201': { description: Pedido criado, content: { application/json: { schema: { $ref: '#/components/schemas/Order' } } } }
+        '402': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /v1/orders/{orderId}:
+    get:
+      summary: Estado atual do pedido (o app faz polling; SSE em seguida)
+      parameters:
+        - { name: orderId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Pedido, content: { application/json: { schema: { $ref: '#/components/schemas/Order' } } } }
+  /v1/sub-orders/{subOrderId}/returns:
+    post:
+      summary: Abre devolução (só após entrega)
+      parameters:
+        - { name: subOrderId, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, enum: [pecaNaoServe, avaria, defeito, pedidoErrado] }
+                note: { type: string }
+      responses:
+        '200': { description: Pedido atualizado, content: { application/json: { schema: { $ref: '#/components/schemas/Order' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+
+  /v1/agent/conversations/{conversationId}/messages:
+    post:
+      summary: Mensagem para o agente de identificação de peça (mesmo agente do WhatsApp)
+      parameters:
+        - { name: conversationId, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [text], properties: { text: { type: string } } } } }
+      responses:
+        '200': { description: Resposta estruturada, content: { application/json: { schema: { $ref: '#/components/schemas/AgentReply' } } } }
+
+  /v1/courier/deliveries/available:
+    get:
+      summary: Rotas disponíveis perto do entregador
+      responses:
+        '200': { description: Corridas, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Delivery' } } } } }
+  /v1/courier/deliveries/current:
+    get:
+      summary: Corrida em andamento, ou null
+      responses:
+        '200': { description: Corrida, content: { application/json: { schema: { oneOf: [{ $ref: '#/components/schemas/Delivery' }, { type: 'null' }] } } } }
+  /v1/courier/deliveries/{deliveryId}:
+    get:
+      parameters: [{ name: deliveryId, in: path, required: true, schema: { type: string } }]
+      responses:
+        '200': { description: Corrida, content: { application/json: { schema: { $ref: '#/components/schemas/Delivery' } } } }
+  /v1/courier/deliveries/{deliveryId}/accept:
+    post:
+      parameters: [{ name: deliveryId, in: path, required: true, schema: { type: string } }]
+      responses:
+        '200': { description: Corrida aceita, content: { application/json: { schema: { $ref: '#/components/schemas/Delivery' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+  /v1/courier/deliveries/{deliveryId}/advance:
+    post:
+      summary: Avança a etapa. Coleta exige NF-e autorizada; entrega exige o código da oficina.
+      parameters: [{ name: deliveryId, in: path, required: true, schema: { type: string } }]
+      requestBody:
+        content: { application/json: { schema: { type: object, properties: { deliveryCode: { type: string } } } } }
+      responses:
+        '200': { description: Corrida atualizada, content: { application/json: { schema: { $ref: '#/components/schemas/Delivery' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+
+components:
+  securitySchemes:
+    bearer: { type: http, scheme: bearer }
+  responses:
+    Error:
+      description: Erro de negócio
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [code, message]
+            properties:
+              code: { type: string, examples: [plate_not_found, credit_denied, invalid_transition] }
+              message: { type: string }
+  schemas:
+    Session:
+      type: object
+      required: [token, subjectId, displayName]
+      properties: { token: { type: string }, subjectId: { type: string }, displayName: { type: string } }
+    WorkshopAccount:
+      type: object
+      required: [id, cnpj, tradeName, address, creditLimitCents, creditUsedCents]
+      properties:
+        id: { type: string }
+        cnpj: { type: string }
+        tradeName: { type: string }
+        address: { type: string }
+        creditLimitCents: { type: integer }
+        creditUsedCents: { type: integer }
+    Vehicle:
+      type: object
+      required: [id, plate, brand, model, year, engine]
+      properties:
+        id: { type: string }
+        plate: { type: string }
+        brand: { type: string }
+        model: { type: string }
+        year: { type: integer }
+        engine: { type: string }
+        fipeCode: { type: string }
+    Part:
+      type: object
+      required: [id, name, brand, category, oemCode]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        brand: { type: string }
+        category: { type: string }
+        oemCode: { type: string }
+        equivalentCodes: { type: array, items: { type: string } }
+    FitmentMatch:
+      type: object
+      required: [part, confidence]
+      properties:
+        part: { $ref: '#/components/schemas/Part' }
+        confidence: { type: number, minimum: 0, maximum: 1, description: 'Abaixo de 0,85 o app exige conferência do código' }
+        note: { type: string }
+    Offer:
+      type: object
+      required: [id, partId, distributorId, distributorName, priceCents, stock, etaMinutes, reliability]
+      properties:
+        id: { type: string }
+        partId: { type: string }
+        distributorId: { type: string }
+        distributorName: { type: string }
+        priceCents: { type: integer }
+        stock: { type: integer }
+        etaMinutes: { type: integer }
+        reliability: { type: number, minimum: 0, maximum: 1 }
+    PaymentMethod: { type: string, enum: [pix, cartao, faturado] }
+    OrderStatus:
+      type: string
+      enum: [criado, pagamentoAutorizado, estoqueReservado, aceitoPeloDistribuidor, emSeparacao, nfeAutorizada,
+             coletado, emRota, entregue, reofertando, nfeRejeitada, redespacho, devolucaoSolicitada, devolvido, cancelado]
+    StatusEvent:
+      type: object
+      required: [status, at]
+      properties:
+        status: { $ref: '#/components/schemas/OrderStatus' }
+        at: { type: string, format: date-time }
+        note: { type: string }
+    OrderLine:
+      type: object
+      required: [partId, partName, quantity, unitPriceCents]
+      properties:
+        partId: { type: string }
+        partName: { type: string }
+        quantity: { type: integer }
+        unitPriceCents: { type: integer }
+    SubOrder:
+      type: object
+      required: [id, distributorName, lines, history, promisedAt, deliveryCode]
+      properties:
+        id: { type: string }
+        distributorName: { type: string }
+        lines: { type: array, items: { $ref: '#/components/schemas/OrderLine' } }
+        history: { type: array, items: { $ref: '#/components/schemas/StatusEvent' }, description: O último evento é o status atual }
+        promisedAt: { type: string, format: date-time }
+        deliveryCode: { type: string, description: Código que a oficina informa ao entregador }
+        nfeKey: { type: string, minLength: 44, maxLength: 44 }
+        courierName: { type: string }
+    Order:
+      type: object
+      required: [id, createdAt, paymentMethod, subOrders]
+      properties:
+        id: { type: string }
+        createdAt: { type: string, format: date-time }
+        paymentMethod: { $ref: '#/components/schemas/PaymentMethod' }
+        subOrders: { type: array, items: { $ref: '#/components/schemas/SubOrder' } }
+    AgentReply:
+      type: object
+      required: [text]
+      properties:
+        text: { type: string }
+        vehicle: { $ref: '#/components/schemas/Vehicle' }
+        matches: { type: array, items: { $ref: '#/components/schemas/FitmentMatch' } }
+        offers: { type: array, items: { $ref: '#/components/schemas/Offer' } }
+        quickReplies: { type: array, items: { type: string } }
+        handoffToHuman: { type: boolean }
+    Delivery:
+      type: object
+      required: [id, subOrderId, distributorName, pickupAddress, workshopName, dropoffAddress, distanceKm, feeCents,
+                 vehicleType, itemsSummary, status, nfeAuthorized]
+      properties:
+        id: { type: string }
+        subOrderId: { type: string }
+        distributorName: { type: string }
+        pickupAddress: { type: string }
+        workshopName: { type: string }
+        dropoffAddress: { type: string }
+        distanceKm: { type: number }
+        feeCents: { type: integer }
+        vehicleType: { type: string, enum: [moto, carro, utilitario] }
+        itemsSummary: { type: string }
+        status: { type: string, enum: [disponivel, aceita, noDistribuidor, coletada, emRota, entregue] }
+        nfeAuthorized: { type: boolean }

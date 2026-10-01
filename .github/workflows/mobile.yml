@@ -1,0 +1,90 @@
+name: mobile
+
+on:
+  push:
+    branches: [main]
+    paths: ['mobile/**', '.github/workflows/mobile.yml']
+  pull_request:
+    paths: ['mobile/**', '.github/workflows/mobile.yml']
+
+concurrency:
+  group: mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: '3.47.5'
+
+defaults:
+  run:
+    working-directory: mobile
+
+jobs:
+  check:
+    name: Formato, análise e testes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed packages apps
+      - name: Analyze
+        run: |
+          for dir in packages/autopecas_core apps/oficina apps/entregador; do
+            (cd "$dir" && flutter analyze --fatal-infos)
+          done
+      - name: Test
+        run: |
+          for dir in packages/autopecas_core apps/oficina apps/entregador; do
+            (cd "$dir" && flutter test)
+          done
+
+  android:
+    name: Build Android (${{ matrix.app }})
+    needs: check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [oficina, entregador]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: APK (modo demonstração)
+        working-directory: mobile/apps/${{ matrix.app }}
+        run: flutter build apk --debug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-android-debug
+          path: mobile/apps/${{ matrix.app }}/build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 14
+
+  ios:
+    name: Build iOS (${{ matrix.app }})
+    needs: check
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        app: [oficina, entregador]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Simulador (sem assinatura)
+        working-directory: mobile/apps/${{ matrix.app }}
+        run: flutter build ios --simulator --debug
