@@ -1,0 +1,29 @@
+name: oficina_app
+description: "App da oficina mecânica: identifica a peça, cota, compra e acompanha a entrega."
+publish_to: 'none'
+version: 0.1.0+1
+resolution: workspace
+
+environment:
+  sdk: ^3.13.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  autopecas_core:
+    path: ../../packages/autopecas_core
+  flutter_riverpod: ^3.4.3
+  go_router: ^18.0.2
+  intl: ^0.20.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  integration_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

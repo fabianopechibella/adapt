@@ -1,0 +1,11 @@
+name: autopecas_workspace
+description: Workspace Flutter do marketplace de autopeças para oficinas (iOS e Android).
+publish_to: none
+
+environment:
+  sdk: ^3.13.4
+
+workspace:
+  - packages/autopecas_core
+  - apps/oficina
+  - apps/entregador
