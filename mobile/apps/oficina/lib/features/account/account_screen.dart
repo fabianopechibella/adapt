@@ -19,8 +19,7 @@ class AccountScreen extends ConsumerWidget {
         error: (e, _) => ErrorView(e, onRetry: () => ref.invalidate(accountProvider)),
         data: (a) {
           final used = a.creditLimit.cents == 0 ? 0.0 : a.creditUsed.cents / a.creditLimit.cents;
-          return ListView(
-            padding: const EdgeInsets.all(Tokens.space4),
+          return ResponsiveListView(
             children: [
               Text(a.tradeName, style: theme.textTheme.titleLarge),
               Text('CNPJ ${a.cnpj}', style: theme.textTheme.bodyMedium),

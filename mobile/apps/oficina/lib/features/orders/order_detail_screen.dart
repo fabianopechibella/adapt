@@ -20,8 +20,7 @@ class OrderDetailScreen extends ConsumerWidget {
       body: order.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => ErrorView(e, onRetry: () => ref.invalidate(orderProvider(orderId))),
-        data: (o) => ListView(
-          padding: const EdgeInsets.all(Tokens.space4),
+        data: (o) => ResponsiveListView(
           children: [
             Text('${o.paymentMethod.label} · total ${o.total.format()}', style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: Tokens.space3),

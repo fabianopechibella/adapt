@@ -52,8 +52,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       appBar: AppBar(title: const Text('Carrinho')),
       body: cart.isEmpty
           ? const EmptyState(icon: Icons.shopping_cart_outlined, title: 'Seu carrinho está vazio')
-          : ListView(
-              padding: const EdgeInsets.all(Tokens.space4),
+          : ResponsiveListView(
               children: [
                 for (final entry in cart.byDistributor.entries) ...[
                   Text(entry.key, style: theme.textTheme.titleSmall),
@@ -92,30 +91,32 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       bottomNavigationBar: cart.isEmpty
           ? null
           : SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(Tokens.space4),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '${cart.itemCount} ${cart.itemCount == 1 ? 'item' : 'itens'} · até ~${cart.etaMinutes} min',
+              child: MaxContentWidth(
+                child: Padding(
+                  padding: const EdgeInsets.all(Tokens.space4),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '${cart.itemCount} ${cart.itemCount == 1 ? 'item' : 'itens'} · até ~${cart.etaMinutes} min',
+                            ),
                           ),
-                        ),
-                        Text(cart.total.format(), style: theme.textTheme.titleLarge),
-                      ],
-                    ),
-                    const SizedBox(height: Tokens.space3),
-                    FilledButton(
-                      key: const Key('checkout'),
-                      onPressed: _busy ? null : () => _checkout(cart),
-                      child: _busy
-                          ? const SizedBox.square(dimension: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                          : Text('Confirmar pedido · ${_payment.label}'),
-                    ),
-                  ],
+                          Text(cart.total.format(), style: theme.textTheme.titleLarge),
+                        ],
+                      ),
+                      const SizedBox(height: Tokens.space3),
+                      FilledButton(
+                        key: const Key('checkout'),
+                        onPressed: _busy ? null : () => _checkout(cart),
+                        child: _busy
+                            ? const SizedBox.square(dimension: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                            : Text('Confirmar pedido · ${_payment.label}'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

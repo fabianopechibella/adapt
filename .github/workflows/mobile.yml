@@ -88,3 +88,24 @@ jobs:
       - name: Simulador (sem assinatura)
         working-directory: mobile/apps/${{ matrix.app }}
         run: flutter build ios --simulator --debug
+
+  web:
+    name: Build web (oficina)
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Build web (modo demonstração)
+        working-directory: mobile/apps/oficina
+        run: flutter build web --release --no-web-resources-cdn
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oficina-web
+          path: mobile/apps/oficina/build/web/
+          retention-days: 14

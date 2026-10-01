@@ -20,6 +20,12 @@ void main() {
     expect(cart.top, greaterThanOrEqualTo(strip.bottom));
   });
 
+  test('responsivePadding centraliza só quando sobra espaço', () {
+    expect(responsivePadding(400).left, Tokens.space4);
+    expect(responsivePadding(1160).left, (1160 - kContentMaxWidth) / 2);
+    expect(responsivePadding(1160).right, responsivePadding(1160).left);
+  });
+
   testWidgets('DemoBanner desligado não altera a árvore', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: DemoBanner(enabled: false, child: Text('app'))));
     expect(find.textContaining('DEMONSTRAÇÃO'), findsNothing);

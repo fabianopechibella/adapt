@@ -51,6 +51,19 @@ jobs:
           disable-animations: true
           working-directory: mobile/apps/${{ matrix.app }}
           script: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/demo_flow_test.dart -d emulator-5554
+      - name: Capturas reduzidas no log (revisão remota)
+        if: always()
+        working-directory: mobile/apps/${{ matrix.app }}
+        run: |
+          [ -d screenshots ] || exit 0
+          sudo apt-get install -y -qq imagemagick > /dev/null
+          echo "::group::Capturas em base64 (JPEG 360 px)"
+          for f in screenshots/*.png; do
+            echo "=== CAPTURA $(basename "$f" .png) ==="
+            convert "$f" -resize 360x -quality 70 jpg:- | base64 -w 0
+            echo
+          done
+          echo "::endgroup::"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -90,6 +103,19 @@ jobs:
       - name: Fluxo de demonstração no simulador
         working-directory: mobile/apps/${{ matrix.app }}
         run: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/demo_flow_test.dart -d ${{ steps.sim.outputs.udid }}
+      - name: Capturas reduzidas no log (revisão remota)
+        if: always()
+        working-directory: mobile/apps/${{ matrix.app }}
+        run: |
+          [ -d screenshots ] || exit 0
+          echo "::group::Capturas em base64 (JPEG 360 px)"
+          for f in screenshots/*.png; do
+            echo "=== CAPTURA $(basename "$f" .png) ==="
+            sips -s format jpeg -s formatOptions 70 --resampleWidth 360 "$f" --out /tmp/captura.jpg > /dev/null
+            base64 -i /tmp/captura.jpg
+            echo
+          done
+          echo "::endgroup::"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

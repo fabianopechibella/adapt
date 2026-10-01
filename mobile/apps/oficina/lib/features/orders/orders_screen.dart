@@ -28,23 +28,25 @@ class OrdersScreen extends ConsumerWidget {
                     EmptyState(icon: Icons.receipt_long_outlined, title: 'Nenhum pedido ainda'),
                   ],
                 )
-              : ListView.separated(
-                  padding: const EdgeInsets.all(Tokens.space4),
-                  itemCount: list.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: Tokens.space2),
-                  itemBuilder: (context, i) {
-                    final o = list[i];
-                    return Card(
-                      child: ListTile(
-                        onTap: () => context.go('/pedidos/${o.id}'),
-                        title: Text(o.id),
-                        subtitle: Text(
-                          '${_date.format(o.createdAt)} · ${o.subOrders.length} entrega(s) · ${o.total.format()}',
+              : LayoutBuilder(
+                  builder: (context, constraints) => ListView.separated(
+                    padding: responsivePadding(constraints.maxWidth),
+                    itemCount: list.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: Tokens.space2),
+                    itemBuilder: (context, i) {
+                      final o = list[i];
+                      return Card(
+                        child: ListTile(
+                          onTap: () => context.go('/pedidos/${o.id}'),
+                          title: Text(o.id),
+                          subtitle: Text(
+                            '${_date.format(o.createdAt)} · ${o.subOrders.length} entrega(s) · ${o.total.format()}',
+                          ),
+                          trailing: StatusPill(o.headline),
                         ),
-                        trailing: StatusPill(o.headline),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
         ),
       ),

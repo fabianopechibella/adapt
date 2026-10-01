@@ -49,54 +49,58 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              controller: _scroll,
-              padding: const EdgeInsets.all(Tokens.space4),
-              itemCount: state.messages.length + (state.sending ? 1 : 0),
-              itemBuilder: (context, i) =>
-                  i == state.messages.length ? const _Typing() : _Bubble(message: state.messages[i]),
+            child: LayoutBuilder(
+              builder: (context, constraints) => ListView.builder(
+                controller: _scroll,
+                padding: responsivePadding(constraints.maxWidth),
+                itemCount: state.messages.length + (state.sending ? 1 : 0),
+                itemBuilder: (context, i) =>
+                    i == state.messages.length ? const _Typing() : _Bubble(message: state.messages[i]),
+              ),
             ),
           ),
           if (last != null && last.quickReplies.isNotEmpty)
-            SizedBox(
-              height: 48,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: Tokens.space4),
-                children: [
-                  for (final q in last.quickReplies)
-                    Padding(
-                      padding: const EdgeInsets.only(right: Tokens.space2),
-                      child: ActionChip(label: Text(q), onPressed: state.sending ? null : () => _send(q)),
-                    ),
-                ],
+            MaxContentWidth(
+              child: SizedBox(
+                height: 48,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: Tokens.space4),
+                  children: [
+                    for (final q in last.quickReplies)
+                      Padding(
+                        padding: const EdgeInsets.only(right: Tokens.space2),
+                        child: ActionChip(label: Text(q), onPressed: state.sending ? null : () => _send(q)),
+                      ),
+                  ],
+                ),
               ),
             ),
           SafeArea(
             top: false,
-            child: Padding(
-              padding: const EdgeInsets.all(Tokens.space3),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      key: const Key('agent-input'),
-                      controller: _input,
-                      minLines: 1,
-                      maxLines: 4,
-                      textInputAction: TextInputAction.send,
-                      decoration: const InputDecoration(hintText: 'Ex.: pastilha de freio do HB20 BRA2E19'),
-                      onSubmitted: (_) => _send(),
+            child: MaxContentWidth(
+              child: Padding(
+                padding: const EdgeInsets.all(Tokens.space3),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        key: const Key('agent-input'),
+                        controller: _input,
+                        textInputAction: TextInputAction.send,
+                        decoration: const InputDecoration(hintText: 'Ex.: pastilha de freio do HB20 BRA2E19'),
+                        onSubmitted: (_) => _send(),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: Tokens.space2),
-                  IconButton.filled(
-                    key: const Key('agent-send'),
-                    tooltip: 'Enviar',
-                    onPressed: state.sending ? null : _send,
-                    icon: const Icon(Icons.send),
-                  ),
-                ],
+                    const SizedBox(width: Tokens.space2),
+                    IconButton.filled(
+                      key: const Key('agent-send'),
+                      tooltip: 'Enviar',
+                      onPressed: state.sending ? null : _send,
+                      icon: const Icon(Icons.send),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

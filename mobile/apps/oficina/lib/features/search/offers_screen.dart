@@ -45,8 +45,7 @@ class _OffersScreenState extends ConsumerState<OffersScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Ofertas'), actions: const [CartAction()]),
-      body: ListView(
-        padding: const EdgeInsets.all(Tokens.space4),
+      body: ResponsiveListView(
         children: [
           if (match != null) ...[
             Row(

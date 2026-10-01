@@ -6,6 +6,7 @@ arquitetura C4 do case (contexto, contêineres, saga do pedido e agente de IA).
 | App | Para quem | O que faz |
 | --- | --- | --- |
 | `apps/oficina` | Mecânico e comprador da oficina | Placa → veículo → peça compatível → ofertas ranqueadas → carrinho multifornecedor → pedido → acompanhamento da saga → devolução. Inclui o assistente de IA. |
+| `apps/oficina` (web) | Comprador no computador do balcão | Mesmo código, com menu lateral e conteúdo centralizado em telas a partir de 840 px; instalável como PWA. |
 | `apps/entregador` | Entregador parceiro | Rotas disponíveis → aceite → coleta (bloqueada sem NF-e) → rota → entrega com código da oficina. |
 | `packages/autopecas_core` | Os dois apps | Domínio, regras da saga, ranking de ofertas, validadores, contrato HTTP, backends de demonstração e design system. |
 
@@ -65,6 +66,24 @@ dart format --set-exit-if-changed packages apps
 
 O workflow `.github/workflows/mobile.yml` roda formato, análise e testes, e depois compila o
 APK (Ubuntu) e o app de simulador iOS (macOS) de cada app.
+
+## Versão web (Oficina)
+
+```bash
+cd apps/oficina
+flutter run -d chrome                                   # desenvolvimento
+flutter build web --release --no-web-resources-cdn      # saída em build/web/
+flutter build web --release --base-href /oficina/ \
+  --dart-define=API_BASE_URL=https://bff-oficina.exemplo.com.br
+```
+
+- `build/web/` é estático: serve em qualquer CDN (Vercel, CloudFront, Firebase Hosting).
+  `--no-web-resources-cdn` embute o motor gráfico (CanvasKit) em vez de baixá-lo do gstatic.
+- O BFF precisa liberar CORS para o domínio do app web.
+- Cache: `index.html`, `flutter_bootstrap.js` e `flutter_service_worker.js` sem cache; o resto pode ter cache longo.
+- O token fica só em memória: recarregar a página pede login de novo (persistência segura é item da lista de produção).
+- O CI publica o build como artefato `oficina-web`.
+- O app do entregador não tem versão web: depende de GPS em segundo plano e câmera.
 
 ## Emulador Android e simulador iOS
 

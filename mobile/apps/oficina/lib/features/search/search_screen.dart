@@ -59,8 +59,7 @@ class _PlateStepState extends ConsumerState<_PlateStep> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDemo = ref.watch(configProvider).isDemo;
-    return ListView(
-      padding: const EdgeInsets.all(Tokens.space4),
+    return ResponsiveListView(
       children: [
         Text('Qual é o veículo?', style: theme.textTheme.titleLarge),
         const SizedBox(height: Tokens.space2),
@@ -131,8 +130,7 @@ class _PartStepState extends ConsumerState<_PartStep> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final results = ref.watch(searchProvider((vehicleId: widget.vehicle.id, query: _submitted)));
-    return ListView(
-      padding: const EdgeInsets.all(Tokens.space4),
+    return ResponsiveListView(
       children: [
         Card(
           child: ListTile(

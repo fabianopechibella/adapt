@@ -1,8 +1,58 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../domain/order.dart';
 import '../domain/part.dart';
 import 'theme.dart';
+
+/// Largura máxima do conteúdo em telas largas (web e tablet): linhas de texto
+/// e cards longos demais ficam difíceis de ler no monitor do balcão.
+const kContentMaxWidth = 760.0;
+
+/// A partir desta largura a navegação vai para a lateral (NavigationRail).
+const kWideLayoutBreakpoint = 840.0;
+
+/// Padding que centraliza o conteúdo em [maxWidth] sem prender a rolagem ao centro.
+EdgeInsets responsivePadding(double availableWidth, {double maxWidth = kContentMaxWidth}) {
+  final side = math.max(Tokens.space4, (availableWidth - maxWidth) / 2);
+  return EdgeInsets.fromLTRB(side, Tokens.space4, side, Tokens.space4);
+}
+
+/// ListView que centraliza os filhos em telas largas; no celular é um ListView comum.
+class ResponsiveListView extends StatelessWidget {
+  const ResponsiveListView({super.key, required this.children, this.maxWidth = kContentMaxWidth});
+
+  final List<Widget> children;
+  final double maxWidth;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) => ListView(
+      padding: responsivePadding(constraints.maxWidth, maxWidth: maxWidth),
+      children: children,
+    ),
+  );
+}
+
+/// Limita a largura de barras fixas (rodapé do carrinho, campo do chat).
+class MaxContentWidth extends StatelessWidget {
+  const MaxContentWidth({super.key, required this.child, this.maxWidth = kContentMaxWidth});
+
+  final Widget child;
+  final double maxWidth;
+
+  @override
+  Widget build(BuildContext context) => Align(
+    alignment: Alignment.topCenter,
+    // heightFactor 1: em slots como bottomNavigationBar o Align não pode crescer na vertical.
+    heightFactor: 1,
+    child: ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: child,
+    ),
+  );
+}
 
 enum Tone { neutral, info, success, warning, critical }
 

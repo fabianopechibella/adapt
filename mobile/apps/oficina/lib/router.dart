@@ -79,24 +79,56 @@ class HomeShell extends StatelessWidget {
 
   final StatefulNavigationShell shell;
 
+  static const _destinations = [
+    (icon: Icons.search, selected: Icons.search, label: 'Buscar'),
+    (icon: Icons.forum_outlined, selected: Icons.forum, label: 'Assistente'),
+    (icon: Icons.receipt_long_outlined, selected: Icons.receipt_long, label: 'Pedidos'),
+    (icon: Icons.store_outlined, selected: Icons.store, label: 'Conta'),
+  ];
+
+  void _go(int i) => shell.goBranch(i, initialLocation: i == shell.currentIndex);
+
+  /// Celular: barra inferior. Tablet e web no computador: menu lateral,
+  /// que libera altura útil e é o padrão esperado em telas largas.
   @override
-  Widget build(BuildContext context) => Scaffold(
-    body: shell,
-    bottomNavigationBar: NavigationBar(
-      selectedIndex: shell.currentIndex,
-      onDestinationSelected: (i) => shell.goBranch(i, initialLocation: i == shell.currentIndex),
-      destinations: const [
-        NavigationDestination(icon: Icon(Icons.search), label: 'Buscar'),
-        NavigationDestination(icon: Icon(Icons.forum_outlined), selectedIcon: Icon(Icons.forum), label: 'Assistente'),
-        NavigationDestination(
-          icon: Icon(Icons.receipt_long_outlined),
-          selectedIcon: Icon(Icons.receipt_long),
-          label: 'Pedidos',
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    if (width < kWideLayoutBreakpoint) {
+      return Scaffold(
+        body: shell,
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: shell.currentIndex,
+          onDestinationSelected: _go,
+          destinations: [
+            for (final d in _destinations)
+              NavigationDestination(icon: Icon(d.icon), selectedIcon: Icon(d.selected), label: d.label),
+          ],
         ),
-        NavigationDestination(icon: Icon(Icons.store_outlined), selectedIcon: Icon(Icons.store), label: 'Conta'),
-      ],
-    ),
-  );
+      );
+    }
+    return Scaffold(
+      body: Row(
+        children: [
+          NavigationRail(
+            selectedIndex: shell.currentIndex,
+            onDestinationSelected: _go,
+            extended: width >= 1200,
+            labelType: width >= 1200 ? NavigationRailLabelType.none : NavigationRailLabelType.all,
+            leading: Padding(
+              padding: const EdgeInsets.symmetric(vertical: Tokens.space3),
+              child: Icon(Icons.build_circle, size: 36, color: Theme.of(context).colorScheme.primary),
+            ),
+            destinations: [
+              for (final d in _destinations)
+                NavigationRailDestination(icon: Icon(d.icon), selectedIcon: Icon(d.selected), label: Text(d.label)),
+            ],
+          ),
+          const VerticalDivider(width: 1),
+          Expanded(child: shell),
+        ],
+      ),
+    );
+  }
 }
 
 /// Ícone do carrinho com contador, usado na AppBar das telas de compra.
