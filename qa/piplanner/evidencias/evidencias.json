@@ -1,0 +1,27 @@
+{
+  "01-login-botao-sem-nome.png": {
+    "rules": [
+      "button-name"
+    ],
+    "count": 2
+  },
+  "02-home-contraste.png": {
+    "rules": [
+      "color-contrast"
+    ],
+    "count": 15
+  },
+  "04-papeis-permissoes-botoes-sem-nome.png": {
+    "rules": [
+      "button-name"
+    ],
+    "count": 81
+  },
+  "05-gestao-usuarios.png": {
+    "rules": [
+      "button-name",
+      "color-contrast"
+    ],
+    "count": 26
+  }
+}
