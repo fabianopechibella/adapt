@@ -1,0 +1,42 @@
+{
+  "base_url": "https://piplanner.io",
+  "degraus": [
+    {
+      "concorrencia": 5,
+      "requisicoes": 60,
+      "taxa_erro_5xx": 0.0,
+      "taxa_429": 0.0,
+      "latencia_media_s": 0.633,
+      "latencia_p95_s": 1.208,
+      "latencia_max_s": 1.318
+    },
+    {
+      "concorrencia": 10,
+      "requisicoes": 60,
+      "taxa_erro_5xx": 0.0,
+      "taxa_429": 0.0,
+      "latencia_media_s": 0.504,
+      "latencia_p95_s": 0.583,
+      "latencia_max_s": 0.71
+    },
+    {
+      "concorrencia": 20,
+      "requisicoes": 60,
+      "taxa_erro_5xx": 0.0,
+      "taxa_429": 0.0,
+      "latencia_media_s": 0.489,
+      "latencia_p95_s": 0.587,
+      "latencia_max_s": 0.629
+    },
+    {
+      "concorrencia": 30,
+      "requisicoes": 60,
+      "taxa_erro_5xx": 0.0,
+      "taxa_429": 0.0,
+      "latencia_media_s": 0.474,
+      "latencia_p95_s": 0.582,
+      "latencia_max_s": 0.679
+    }
+  ],
+  "parada_seguranca": null
+}
