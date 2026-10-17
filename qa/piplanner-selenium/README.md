@@ -27,6 +27,7 @@ Credenciais vêm só de variáveis de ambiente; nunca ficam no código. O servid
 | `tests/test_04_links_integracao.py` | Links/integração | Recursos estáticos, vídeo da home, links externos, rota inexistente |
 | `tests/test_05_seguranca.py` | Segurança (leitura) | Headers, exposição de tecnologia, limite de login, enumeração de usuários, arquivos sensíveis |
 | `tests/test_06_carga.py` | Carga/estresse | Carga progressiva (5→30 simultâneos) com parada de segurança automática |
+| `tests/test_08_rbac_escrita.py` | RBAC e escrita | **Desativado por padrão.** Escalação de privilégio (Membro x Admin), isolamento entre organizações (IDOR), ciclo criar/editar/excluir e validação de entrada. Só roda em homologação |
 
 ## Salvaguardas
 
@@ -38,4 +39,18 @@ Credenciais vêm só de variáveis de ambiente; nunca ficam no código. O servid
 
 - Navegador: Chromium headless (sem Safari real nem aparelho físico).
 - Carga medida de um datacenter; serve para comparar e detectar regressão, não reproduz a experiência do usuário final.
-- Funções de cadastro/edição não são exercitadas (modo leitura); exigiriam ambiente de homologação descartável.
+- Funções de cadastro/edição e RBAC estão escritas em `tests/test_08_rbac_escrita.py`, mas **só rodam em homologação** (trava `QA_ENV=homologacao`), com dados descartáveis e autorização formal. Nunca em produção.
+
+## Testes de escrita e RBAC (homologação)
+
+Prontos, porém desativados por segurança. Para executar em um ambiente de testes:
+
+```bash
+export QA_ENV=homologacao
+export BASE_URL=https://staging.piplanner.io
+export QA_ADMIN_USER=... QA_ADMIN_PASS=...     # perfil Administrador
+export QA_MEMBER_USER=... QA_MEMBER_PASS=...    # perfil Membro
+pytest tests/test_08_rbac_escrita.py -v
+```
+
+Cobrem: Membro não acessa área de admin, não edita permissões; isolamento entre organizações; criar/editar/excluir um objetivo (com limpeza automática); validação de entrada (corpo vazio deve dar 400/422, não 500). Os endpoints seguem o contrato observado e podem precisar de ajuste fino ao schema real do ambiente.
