@@ -1,0 +1,62 @@
+{
+  "i18n": {
+    "resultado": "OK",
+    "login": {
+      "ingles": {
+        "opcaoExiste": true,
+        "textoMudou": true,
+        "traduziuDeFato": true,
+        "chavesCruasVisiveis": [],
+        "amostra": "🇺🇸 English Planner Enter your credentials to access the system Email Password Sign In Forgot your password? Don't have an account? Sign up"
+      },
+      "espanhol": {
+        "opcaoExiste": true,
+        "textoMudou": true,
+        "traduziuDeFato": true,
+        "chavesCruasVisiveis": [],
+        "amostra": "🇪🇸 Español Planner Ingrese sus credenciales para acceder al sistema Correo electrónico Contraseña Iniciar sesión ¿Olvidó su contraseña? ¿N"
+      }
+    },
+    "observacao": "Troca de idioma (pt/en/es) traduz toda a tela de login, sem chaves de tradução cruas. Escopo: páginas públicas."
+  },
+  "resiliencia": {
+    "resultado": "ATENÇÃO",
+    "telas": [
+      {
+        "tela": "Dashboard",
+        "presoEmCarregando": false,
+        "mensagemDeErroAmigavel": false,
+        "telaVazia": false,
+        "exceptionsJS": 0
+      },
+      {
+        "tela": "OKRs",
+        "presoEmCarregando": false,
+        "mensagemDeErroAmigavel": false,
+        "telaVazia": false,
+        "exceptionsJS": 0
+      },
+      {
+        "tela": "Gestao de Usuarios",
+        "presoEmCarregando": false,
+        "mensagemDeErroAmigavel": false,
+        "telaVazia": false,
+        "exceptionsJS": 0
+      },
+      {
+        "tela": "Riscos/PICycles",
+        "presoEmCarregando": false,
+        "mensagemDeErroAmigavel": false,
+        "telaVazia": false,
+        "exceptionsJS": 0
+      }
+    ],
+    "observacao": "Com a API indisponível, as telas não travam nem quebram, mas NÃO exibem mensagem de erro: mostram estados falsos de vazio/sucesso (ex.: Dashboard exibe \"0 objetivos\" e \"Todos os objetivos no prazo\"). Falha de rede fica indistinguível de dados vazios."
+  },
+  "legais": {
+    "resultado": "FALHA",
+    "encontrados": [],
+    "observacao": "A home (21 links) não tem Política de Privacidade nem Termos de Uso; o rodapé só traz navegação e o copyright © 2026 PiPlanner. Lacuna de conformidade (LGPD) e de requisito de compra corporativa.",
+    "navegadorAlternativo": "Firefox/WebKit não instaláveis neste ambiente (política de rede bloqueia o download); teste de navegador real diferente não executado."
+  }
+}
