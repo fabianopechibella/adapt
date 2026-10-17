@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contato | PI Planner (fixture)</title>
+  <style>body{font-family:system-ui,sans-serif;margin:16px} input,textarea,button{font-size:16px;padding:12px;display:block;margin:8px 0;min-height:44px}</style>
+</head>
+<body>
+  <nav><a href="/" style="padding:12px;display:inline-block">Início</a></nav>
+  <main>
+    <h1>Fale conosco</h1>
+    <form action="/enviar" method="post">
+      <label for="nome">Nome</label><input id="nome" name="nome" required minlength="2" maxlength="60">
+      <label for="email">E-mail</label><input id="email" name="email" type="email" required>
+      <label for="msg">Mensagem</label><textarea id="msg" name="msg" maxlength="500"></textarea>
+      <button type="submit">Enviar</button>
+    </form>
+  </main>
+</body>
+</html>
