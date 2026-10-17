@@ -17,7 +17,8 @@ type Metric = keyof typeof THRESHOLDS;
 const median = (xs: number[]) => { const s = [...xs].sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
 
 test.describe('Performance — Core Web Vitals', () => {
-  test.describe.configure({ mode: 'serial' }); // medições sem concorrência entre si
+  // 'default' (não 'serial'): uma página reprovada não pode pular a medição das demais.
+  test.describe.configure({ mode: 'default' });
 
   for (const { url } of pages) {
     test(`métricas: ${new URL(url).pathname}`, async ({ browser }, testInfo) => {

@@ -7,7 +7,6 @@ import { attachJson, loadSiteMap, sameOrigin, warn } from '../../helpers/site';
  * Somente leitura: nenhuma tentativa de invasão é feita.
  */
 const site = loadSiteMap();
-test.describe.configure({ mode: 'serial' });
 
 test.describe('Caixa branca — segurança', () => {
   test.beforeEach(({}, testInfo) => test.skip(testInfo.project.name !== 'desktop-chromium', 'Independe do dispositivo: roda só no desktop'));
