@@ -27,6 +27,11 @@ Por categoria: `npm run test:white-box`, `test:black-box`, `test:automated`, `te
 | `PERF_PAGES` / `PERF_RUNS` | 5 / 3 | Páginas e repetições medidas em performance |
 | `ALLOW_SUBMIT=1` | desligado | Permite **envio real** de formulários (pode criar leads/cadastros) |
 | `CHECK_EXTERNAL=1` | desligado | Verifica também os links externos |
+| `QA_USER` / `QA_PASS` | — | Credenciais de teste para a **área logada**. Informe só na linha de comando ou como secret do CI, **nunca no repositório** |
+
+```bash
+QA_USER='usuario@empresa.com' QA_PASS='***' ./scripts/run-all.sh
+```
 
 ### Autoteste da suíte (sem acessar o site)
 
@@ -48,6 +53,7 @@ As páginas em `fixtures/` têm um link quebrado, uma imagem sem `alt` e texto p
 | **Automatizados** | `tests/automated/smoke.spec.ts` | Home carrega; menu (inclusive hambúrguer no mobile) navega; CTAs visíveis/habilitados; screenshots de evidência | Pronto para rodar em CI a cada deploy |
 | **Usabilidade** | `tests/usability/accessibility.spec.ts` | axe-core, WCAG 2.1 A/AA | Violação *critical/serious* reprova |
 | | `tests/usability/ux.spec.ts` | Rolagem horizontal; alvos de toque (24px WCAG 2.2, 44px recomendado); fonte < 12px; zoom do iOS em inputs < 16px; foco visível por teclado; `alt` em imagens | Overflow, alvo < 24px e imagem sem `alt` reprovam |
+| **Área logada** | `tests/authenticated/app.spec.ts` | Login: rota protegida sem sessão, política de senha, credencial inválida, enumeração de usuários, limite de tentativas. Sessão: API sem token, token/permissões no navegador. Cada tela do menu: carrega sem travar em "Carregando...", sem exceção JS nem erro 5xx na API, sem violação grave de acessibilidade, sem rolagem horizontal, tempo até a tela ficar pronta, APIs lentas; menu por teclado e no mobile | **Somente leitura**: POST/PUT/PATCH/DELETE na API são bloqueados. Tela presa, 5xx, exceção ou > 10 s reprovam |
 | **Performance** | `tests/performance/web-vitals.spec.ts` | TTFB, FCP, LCP, CLS, TBT, load, nº de requisições e peso; mediana de N execuções sem cache; Android com CPU 4x + 4G simulado | Acima do limite "ruim" do Google reprova; "precisa melhorar" é aviso |
 
 Limites de Core Web Vitals (bom / ruim): LCP 2,5 s / 4 s · FCP 1,8 s / 3 s · TTFB 0,8 s / 1,8 s · CLS 0,1 / 0,25 · TBT 200 ms / 600 ms.
@@ -56,5 +62,6 @@ Limites de Core Web Vitals (bom / ruim): LCP 2,5 s / 4 s · FCP 1,8 s / 3 s · T
 
 - **iPhone emulado**: viewport, toque e user-agent do iPhone 14 no Chromium (WebKit não está instalado no ambiente). Para Safari real, use `npx playwright install webkit` e troque `browserName` no projeto `mobile-ios`.
 - **Performance de laboratório**: medida a partir do servidor que executa os testes. Serve para comparar versões e detectar regressões, não substitui dados de campo (CrUX/RUM).
-- **Áreas logadas** não são cobertas sem credenciais de teste.
+- **Área logada** só é testada com `QA_USER`/`QA_PASS`. O servidor limita o login a **20 tentativas por 15 min por IP**: a suíte faz um único login no início (`helpers/global-setup.ts`), reaproveita a sessão e faz cerca de 5 tentativas por execução. Evite rodar mais de 3 vezes em 15 minutos. O arquivo de sessão (`reports/.auth-state.json`) é apagado ao fim do `run-all.sh`.
+- **Somente leitura**: os testes não criam, editam nem excluem dados; funcionalidades de cadastro e edição exigiriam um ambiente/conta de testes descartável.
 - **Carga**: a suíte completa gera ~5–15 mil requisições. Execute com autorização do responsável pelo site, de preferência em homologação.

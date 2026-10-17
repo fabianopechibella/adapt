@@ -62,7 +62,8 @@ test.describe('Caixa branca — segurança', () => {
       ['Stripe secret key', /sk_live_[0-9a-zA-Z]{20,}/],
       ['Token GitHub', /gh[pousr]_[A-Za-z0-9]{36}/],
       ['Slack token', /xox[baprs]-[A-Za-z0-9-]{10,}/],
-      ['Senha hardcoded', /(password|passwd|senha)\s*[:=]\s*["'][^"']{6,}["']/i],
+      // Literal sem espaços e com dígito: ignora mensagens ("Erro ao redefinir senha:") e rótulos i18n ("password": "Senha").
+      ['Senha hardcoded', /\b(password|passwd|pwd|senha)["']?\s*[:=]\s*["'](?=[^"'\s]*\d)[^"'\s,;)\/]{6,}["']/i],
     ];
     const findings: string[] = [];
     const maps: string[] = [];

@@ -5,7 +5,7 @@ import path from 'node:path';
 const dir = path.join(path.dirname(new URL(import.meta.url).pathname), '..', 'reports');
 const results = JSON.parse(fs.readFileSync(path.join(dir, 'results.json'), 'utf8'));
 const map = JSON.parse(fs.readFileSync(path.join(dir, 'site-map.json'), 'utf8'));
-const CATEGORY = { 'white-box': 'Caixa branca', 'black-box': 'Caixa preta', automated: 'Automatizados (E2E)', usability: 'Usabilidade', performance: 'Performance' };
+const CATEGORY = { 'white-box': 'Caixa branca', 'black-box': 'Caixa preta', automated: 'Automatizados (E2E)', usability: 'Usabilidade', performance: 'Performance', authenticated: 'Área logada' };
 
 const rows = [];
 const walk = (suite, file) => {
@@ -50,6 +50,15 @@ if (fs.existsSync(perfDir)) {
   for (const f of fs.readdirSync(perfDir).sort()) {
     const { url, device, median: m } = JSON.parse(fs.readFileSync(path.join(perfDir, f), 'utf8'));
     out.push(`| ${new URL(url).pathname} | ${device} | ${m.ttfb.toFixed(0)} | ${m.fcp.toFixed(0)} | ${m.lcp.toFixed(0)} | ${m.cls.toFixed(3)} | ${m.tbt.toFixed(0)} | ${m.load.toFixed(0)} | ${m.requests} | ${m.transferKB.toFixed(0)} |`);
+  }
+}
+const appDir = path.join(dir, 'app');
+if (fs.existsSync(appDir)) {
+  out.push('', '## 🔐 Área logada — telas', '', '| Tela | Dispositivo | Pronta em (ms) | Chamadas API | API ≥ 400 | Acessibilidade (graves) | Exceções JS |', '|---|---|---|---|---|---|---|');
+  for (const f of fs.readdirSync(appDir).sort()) {
+    const r = JSON.parse(fs.readFileSync(path.join(appDir, f), 'utf8'));
+    const bad = r.api.filter((a) => a.status >= 400).map((a) => `${a.status} ${a.url}`).join('<br>') || '—';
+    out.push(`| ${r.label} (${new URL(r.url).pathname}) | ${r.device} | ${r.readyMs}${r.stuck ? ' ⚠️ travou' : ''} | ${r.api.length} | ${bad} | ${r.axe.join(', ') || '—'} | ${r.exceptions.length} |`);
   }
 }
 out.push('', '## Detalhe por teste', '', '| | Categoria | Teste | Dispositivo |', '|---|---|---|---|');

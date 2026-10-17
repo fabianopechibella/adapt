@@ -12,6 +12,7 @@ else
   npx playwright test
 fi
 status=$?
+rm -f reports/.auth-state.json   # contém token de sessão
 node scripts/summarize.mjs
 echo "Relatório HTML: npx playwright show-report reports/html"
 exit $status

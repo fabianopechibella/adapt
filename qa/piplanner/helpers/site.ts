@@ -4,6 +4,8 @@ import type { Page, TestInfo } from '@playwright/test';
 
 export const REPORT_DIR = path.join(__dirname, '..', 'reports');
 export const SITE_MAP_FILE = path.join(REPORT_DIR, 'site-map.json');
+// Sessão salva após o único login da execução (contém token: apagada ao fim do run-all.sh).
+export const AUTH_STATE_FILE = path.join(REPORT_DIR, '.auth-state.json');
 
 export const env = {
   maxPages: Number(process.env.MAX_PAGES || 20),
@@ -11,6 +13,9 @@ export const env = {
   perfRuns: Number(process.env.PERF_RUNS || 3),
   allowSubmit: process.env.ALLOW_SUBMIT === '1',
   checkExternal: process.env.CHECK_EXTERNAL === '1',
+  // Credenciais só via variável de ambiente: nunca gravar no repositório.
+  user: process.env.QA_USER || '',
+  pass: process.env.QA_PASS || '',
 };
 
 export type FieldInfo = {
@@ -22,6 +27,7 @@ export type PageInfo = { url: string; status: number; title: string };
 export type SiteMap = {
   baseURL: string; crawledAt: string;
   pages: PageInfo[]; internalLinks: string[]; externalLinks: string[]; forms: FormInfo[];
+  appPages: { url: string; label: string }[];
 };
 
 export function loadSiteMap(): SiteMap {
@@ -53,3 +59,32 @@ export function sameOrigin(url: string, base: string) {
 }
 
 export const slug = (url: string) => new URL(url).pathname.replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '') || 'home';
+
+/**
+ * Bloqueia qualquer escrita na API (POST/PUT/PATCH/DELETE), exceto o login,
+ * garantindo que os testes na área logada sejam somente leitura.
+ */
+export async function readOnlyApi(page: Page, blocked: string[] = []) {
+  await page.route('**/api/**', (route) => {
+    const r = route.request();
+    if (r.method() === 'GET' || r.method() === 'OPTIONS' || r.url().includes('/auth/login')) return route.continue();
+    blocked.push(`${r.method()} ${new URL(r.url()).pathname}`);
+    return route.abort();
+  });
+  return blocked;
+}
+
+export async function login(page: Page, baseURL: string, user = env.user, pass = env.pass) {
+  await page.goto(baseURL + '/login', { waitUntil: 'networkidle' });
+  await page.fill('input[name="email"], input[type="email"]', user);
+  await page.fill('input[name="password"], input[type="password"]', pass);
+  await page.click('form button[type="submit"]');
+  await page.waitForURL((u) => !u.pathname.startsWith('/login'), { timeout: 30_000 });
+}
+
+/** Espera a tela da SPA terminar de carregar (indicador "Carregando..." some). */
+export async function waitAppReady(page: Page, timeout = 30_000) {
+  await page.waitForLoadState('domcontentloaded');
+  await page.getByText(/^\s*carregando\.{0,3}\s*$/i).first().waitFor({ state: 'hidden', timeout }).catch(() => {});
+  await page.waitForLoadState('networkidle', { timeout: 10_000 }).catch(() => {});
+}
