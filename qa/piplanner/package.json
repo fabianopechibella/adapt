@@ -1,0 +1,21 @@
+{
+  "name": "piplanner-qa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Suíte de QA (caixa branca, caixa preta, automatizados, usabilidade e performance) para https://piplanner.io",
+  "scripts": {
+    "test": "playwright test",
+    "test:white-box": "playwright test tests/white-box",
+    "test:black-box": "playwright test tests/black-box",
+    "test:automated": "playwright test tests/automated",
+    "test:usability": "playwright test tests/usability",
+    "test:performance": "playwright test tests/performance --project=desktop-chromium",
+    "test:selftest": "BASE_URL=http://127.0.0.1:4173 playwright test",
+    "report": "node scripts/summarize.mjs",
+    "serve:fixture": "node scripts/fixture-server.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
+    "@playwright/test": "1.56.1"
+  }
+}
